@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <title>Guía de uso · Sabor del Chipá Casereño</title>
+  <style>
+    @font-face { font-family: 'Playfair Display'; src: url('../fonts/playfair-display-latin-wght-normal.woff2') format('woff2'); font-weight: 400 900; font-style: normal; }
+    @font-face { font-family: 'Playfair Display'; src: url('../fonts/playfair-display-latin-wght-italic.woff2') format('woff2'); font-weight: 400 900; font-style: italic; }
+    @font-face { font-family: 'Montserrat'; src: url('../fonts/montserrat-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-style: normal; }
+
+    :root {
+      --cream: #FBF6EC;
+      --cream-2: #F3E9D6;
+      --paper: #FFFDF8;
+      --ink: #2B1E16;
+      --ink-2: #5E4838;
+      --muted: #8A7463;
+      --gold: #B98A2E;
+      --gold-2: #D9B45A;
+      --gold-soft: #F1E2BE;
+      --celeste: #74ACDF;
+      --sol: #F6B40E;
+      --rojo: #C0392B;
+      --wa: #1FA855;
+      --display: 'Playfair Display', Georgia, serif;
+      --sans: 'Montserrat', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: #d8cbb0;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 10.6pt;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    @page { size: A4; margin: 0; }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      padding: 16mm 18mm 20mm;
+    }
+    .page:last-child { page-break-after: auto; }
+
+    .foot {
+      position: absolute; left: 18mm; right: 18mm; bottom: 10mm;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 8pt; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600;
+    }
+    .foot b { color: var(--gold); letter-spacing: .04em; text-transform: none; font-family: var(--display); font-weight: 600; }
+
+    .kicker {
+      font-size: 8.5pt; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); margin: 0 0 6px;
+    }
+    h1 {
+      font-family: var(--display); font-weight: 600; font-size: 28pt;
+      line-height: 1.05; margin: 0 0 10px; letter-spacing: -.015em;
+    }
+    h1 em { font-style: italic; color: var(--gold); font-weight: 500; }
+    h2 {
+      font-family: var(--display); font-weight: 600; font-size: 18pt;
+      line-height: 1.15; margin: 0 0 10px;
+    }
+    h2 em { font-style: italic; color: var(--gold); font-weight: 500; }
+    h3 {
+      font-family: var(--display); font-weight: 600; font-size: 13pt;
+      margin: 14px 0 6px;
+    }
+    p { margin: 0 0 9px; color: var(--ink-2); }
+    strong { color: var(--ink); font-weight: 700; }
+
+    .rule {
+      height: 1px; border: 0; margin: 12px 0 14px;
+      background: linear-gradient(90deg, transparent, var(--gold-2), transparent);
+    }
+
+    /* Portada */
+    .cover { padding: 0; background: var(--ink); color: var(--cream); }
+    .cover-inner { height: 100%; padding: 18mm 18mm 20mm; display: flex; flex-direction: column; }
+    .cover-top { display: flex; justify-content: space-between; align-items: center; }
+    .flag { width: 28px; height: 18px; border-radius: 2px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,.15); }
+    .flag i { display: block; height: 6px; }
+    .flag i:nth-child(1), .flag i:nth-child(3) { background: #74ACDF; }
+    .flag i:nth-child(2) { background: #fff; position: relative; }
+    .cover-brand { font-size: 8.5pt; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-2); font-weight: 700; }
+    .cover-hero { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8mm 0 4mm; }
+    .cover-logo {
+      width: 92px; height: 92px; border-radius: 50%;
+      box-shadow: 0 0 0 6px rgba(217,180,90,.25), 0 18px 40px rgba(0,0,0,.35);
+      margin-bottom: 16px;
+    }
+    .cover h1 { color: #FFF8EA; font-size: 36pt; max-width: 14ch; }
+    .cover-lead { color: #E8D9C0; font-size: 12.5pt; max-width: 34ch; margin: 8px 0 0; }
+    .cover-meta {
+      display: flex; gap: 18px; flex-wrap: wrap; margin-top: 22px;
+      font-size: 8.5pt; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-2); font-weight: 700;
+    }
+    .cover-bottom {
+      border-top: 1px solid rgba(217,180,90,.28);
+      padding-top: 14px; color: #C9B49A; font-size: 9.5pt;
+    }
+    .sun {
+      position: absolute; right: -28mm; top: -18mm; width: 150mm; height: 150mm;
+      opacity: .09; color: var(--sol);
+    }
+
+    /* Cajas */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .card {
+      background: var(--paper); border: 1px solid rgba(43,30,22,.1);
+      border-radius: 16px; padding: 13px 14px 12px;
+      box-shadow: 0 8px 18px -14px rgba(43,30,22,.35);
+    }
+    .card .n {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--gold); color: #fff; font-weight: 800; font-size: 10pt;
+      display: inline-grid; place-items: center; margin-right: 6px;
+    }
+    .card h3 { margin: 0 0 5px; display: flex; align-items: center; }
+    .card p { margin: 0; font-size: 9.6pt; }
+    .url {
+      display: block; margin-top: 8px; padding: 7px 10px;
+      background: var(--cream-2); border-radius: 8px;
+      font-weight: 700; font-size: 8.6pt; color: var(--ink); word-break: break-all;
+    }
+
+    .steps { list-style: none; padding: 0; margin: 0 0 8px; }
+    .steps li {
+      display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start;
+      padding: 8px 0; border-bottom: 1px solid rgba(43,30,22,.08);
+    }
+    .steps li:last-child { border-bottom: 0; }
+    .dot {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--gold-soft);
+      color: var(--gold); font-weight: 800; font-size: 10pt;
+      display: grid; place-items: center;
+    }
+    .steps b { display: block; color: var(--ink); font-size: 10.4pt; }
+    .steps span { color: var(--muted); font-size: 9.4pt; }
+
+    .pill {
+      display: inline-block; background: var(--gold-soft); color: #6E5016;
+      font-weight: 700; font-size: 8pt; letter-spacing: .06em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 999px; margin-right: 4px;
+    }
+    .pill.green { background: #D9F0E2; color: #1F6B3A; }
+    .pill.blue { background: #E3EFF8; color: #2A5F8F; }
+    .pill.red { background: #F8E4E2; color: #8A2A22; }
+
+    .note {
+      background: #FFF6D6; border-left: 4px solid var(--sol);
+      border-radius: 0 12px 12px 0; padding: 10px 12px; margin: 10px 0;
+    }
+    .note b, .ok b, .warn b { display: block; margin-bottom: 4px; color: var(--ink); }
+    .ok {
+      background: #E8F6EE; border-left: 4px solid var(--wa);
+      border-radius: 0 12px 12px 0; padding: 10px 12px; margin: 10px 0;
+    }
+    .warn {
+      background: #F8EAE7; border-left: 4px solid var(--rojo);
+      border-radius: 0 12px 12px 0; padding: 10px 12px; margin: 10px 0;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9.5pt; }
+    th, td { text-align: left; padding: 7px 8px; vertical-align: top; border-bottom: 1px solid rgba(43,30,22,.1); }
+    th { color: var(--gold); font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; }
+    td b { color: var(--ink); }
+
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    ul.clean { margin: 0; padding: 0 0 0 16px; color: var(--ink-2); }
+    ul.clean li { margin: 0 0 5px; }
+
+    .msg {
+      background: #EAF7EE; border-radius: 14px; padding: 12px 14px;
+      font-size: 9.3pt; color: #1A4A2A; white-space: pre-wrap; line-height: 1.45;
+    }
+    .msg .from { font-size: 8pt; letter-spacing: .1em; text-transform: uppercase; color: var(--wa); font-weight: 800; margin-bottom: 6px; }
+
+    .toc { display: grid; gap: 6px; margin-top: 6px; }
+    .toc a { color: inherit; text-decoration: none; display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dotted rgba(232,217,192,.35); }
+    .toc span { color: var(--gold-2); }
+
+    @media screen {
+      body { padding: 18px 0 40px; }
+      .page { margin: 0 auto 18px; box-shadow: 0 22px 50px -24px rgba(43,30,22,.55); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PORTADA -->
+  <section class="page cover">
+    <svg class="sun" viewBox="-50 -50 100 100" aria-hidden="true">
+      <g fill="currentColor">
+        <circle r="17"/>
+        <g>
+          <path transform="rotate(0)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(45)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(90)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(135)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(180)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(225)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(270)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+          <path transform="rotate(315)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/>
+        </g>
+      </g>
+    </svg>
+    <div class="cover-inner">
+      <div class="cover-top">
+        <div class="cover-brand">Sabor del Chipá · Casereño</div>
+        <div class="flag" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+      <div class="cover-hero">
+        <img class="cover-logo" src="../img/logo-200.png" alt="Sabor del Chipá">
+        <p class="kicker" style="color:#D9B45A">Guía de uso</p>
+        <h1>La web,<br><em>sin vueltas.</em></h1>
+        <p class="cover-lead">Todo lo que necesitás para atender pedidos, cambiar precios y avisar si un día no hay entrega. Sin tocar código.</p>
+        <div class="cover-meta">
+          <span>Octubre 2026</span>
+          <span>CABA, Argentina</span>
+          <span>Para usar desde el celular</span>
+        </div>
+      </div>
+      <div class="cover-bottom">
+        Guardá esta guía. El menú se actualiza desde el panel, los clientes piden y el pedido llega por WhatsApp.
+      </div>
+    </div>
+  </section>
+
+  <!-- PÁGINA 2 -->
+  <section class="page">
+    <p class="kicker">Para arrancar</p>
+    <h2>Dos puertas,<br>un solo <em>negocio</em></h2>
+    <p>La web no cobra ni toma el pedido sola. Es la vidriera. El mostrador de atrás es el panel. Y la caja sigue siendo WhatsApp, como siempre.</p>
+    <hr class="rule">
+
+    <div class="grid-2">
+      <article class="card">
+        <h3><span class="n">1</span> La vidriera</h3>
+        <p>Lo que ve la gente: el horno, las variedades, el mix, envíos y preguntas. Desde acá arman el pedido.</p>
+        <span class="url">sabordelchipa.vercel.app</span>
+      </article>
+      <article class="card">
+        <h3><span class="n">2</span> El panel</h3>
+        <p>Solo vos. Ahí cambiás productos, fotos, precios, WhatsApp, días de entrega y el cartel de aviso.</p>
+        <span class="url">sabordelchipa.vercel.app/admin</span>
+      </article>
+    </div>
+
+    <div class="note">
+      <b>Tip de oro</b>
+      Agregá las dos direcciones a Favoritos del celular. El panel está pensado para usarlo con el dedo, no con la computadora.
+    </div>
+
+    <h3>Qué hace cada parte de la vidriera</h3>
+    <table>
+      <tr><th>Sección</th><th>Para qué está</th></tr>
+      <tr><td><b>Del freezer al horno</b></td><td>Explica en 20 minutos cómo se hornea. No hace falta descongelar.</td></tr>
+      <tr><td><b>Historia y mate</b></td><td>Cuenta quiénes son y por qué el chipá va con el mate.</td></tr>
+      <tr><td><b>Variedades</b></td><td>El catálogo. Acá se suma cada bolsa al pedido.</td></tr>
+      <tr><td><b>Armá tu mix</b></td><td>Eligen 2 o más sabores en ½ kg. El precio queda a confirmar.</td></tr>
+      <tr><td><b>Envíos</b></td><td>Zona y días. Esto lo editás vos desde el panel.</td></tr>
+      <tr><td><b>Mi pedido</b></td><td>El carrito. Completan nombre y dirección y te escriben por WhatsApp.</td></tr>
+    </table>
+
+    <div class="ok">
+      <b>Lo importante</b>
+      Si cambiás algo en el panel y tocás Guardar, se ve en la web al toque. No hay que “subir de nuevo” la página.
+    </div>
+    <div class="foot"><span>Sabor del Chipá Casereño</span><b>02</b></div>
+  </section>
+
+  <!-- PÁGINA 3 -->
+  <section class="page">
+    <p class="kicker">El lado del cliente</p>
+    <h2>Así te llega<br>un <em>pedido</em></h2>
+    <p>Cuando alguien toca <strong>Enviar pedido por WhatsApp</strong>, no se cobra nada en la web. Se abre una conversación con vos, con el mensaje ya armado.</p>
+    <hr class="rule">
+
+    <ol class="steps">
+      <li><span class="dot">1</span><div><b>Eligen</b><span>Variedad, ½ kg o 1 kg, y el sabor si hay opciones (por ejemplo “con sal” o “jamón y queso”).</span></div></li>
+      <li><span class="dot">2</span><div><b>Pueden armar un mix</b><span>Marcan al menos dos variedades y suman un mix de ½ kg. Ese ítem llega “a confirmar”.</span></div></li>
+      <li><span class="dot">3</span><div><b>Abren “Mi pedido”</b><span>Ponen nombre, barrio o dirección, día de entrega, forma de pago y una nota si hace falta.</span></div></li>
+      <li><span class="dot">4</span><div><b>Te escriben</b><span>WhatsApp se abre con el pedido listo. Vos confirmás stock, coordinás el envío y cobrás como siempre.</span></div></li>
+    </ol>
+
+    <h3>Así se ve el mensaje</h3>
+    <div class="msg"><div class="from">WhatsApp · te llega a vos</div>¡Hola! Quiero hacer un pedido a *Sabor del Chipá*.
+Pedido N.º 8K2F
+
+*Productos*
+• 1 × Chipá clásico (½ kg, con sal) — $12.000
+• 1 × Mix ½ kg (Clásico + Relleno) — a confirmar
+
+*Total: $12.000* + lo que queda a confirmar
+El envío lo coordinamos por acá.
+
+*Datos de entrega*
+Nombre: Ana Pérez
+Dirección: Villa Crespo
+Día: Viernes por la tarde
+Pago: Transferencia</div>
+
+    <div class="note">
+      <b>Cada pedido tiene un número</b>
+      Esas 4 letras (N.º 8K2F) sirven para no mezclar conversaciones. Si dos personas piden el mismo día, preguntá por el número.
+    </div>
+    <div class="foot"><span>Sabor del Chipá Casereño</span><b>03</b></div>
+  </section>
+
+  <!-- PÁGINA 4 -->
+  <section class="page">
+    <p class="kicker">El panel · Productos</p>
+    <h2>El menú se cambia<br>en <em>un toque</em></h2>
+    <p>Entrá a <strong>sabordelchipa.vercel.app/admin</strong> con tu mail y contraseña. Arriba hay tres pestañas: Productos, Negocio y Cuenta.</p>
+    <hr class="rule">
+
+    <div class="cols">
+      <div>
+        <h3>En la lista</h3>
+        <ul class="clean">
+          <li><strong>Tocá el nombre</strong> para editar ese producto.</li>
+          <li>El <strong>interruptor</strong> marca si hay stock. Si lo apagás, en la web dice “Sin stock por ahora” y no se puede sumar.</li>
+          <li><strong>▲ ▼</strong> cambian el orden. El de arriba es el primero que ve la gente.</li>
+          <li><strong>＋ Nuevo</strong> crea una variedad.</li>
+        </ul>
+        <h3>Al editar</h3>
+        <ul class="clean">
+          <li><strong>Nombre y descripción</strong> son lo que se lee en la tarjeta.</li>
+          <li><strong>Precio ½ kg y 1 kg</strong>: si dejás uno vacío, en la web aparece “Consultar”.</li>
+          <li><strong>Cantidad aproximada</strong>: por ejemplo “≈ 15 unidades por ½ kg”.</li>
+          <li><strong>Etiquetas</strong>: Tres quesos, Vegano, Para picar… van con coma.</li>
+          <li><strong>Variedades / sabores</strong>: una por línea. El cliente elige en un menú.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Las tres tildes</h3>
+        <p><span class="pill green">Hay stock</span> se puede pedir.</p>
+        <p><span class="pill">Se hace a pedido</span> muestra la etiqueta “A pedido”.</p>
+        <p><span class="pill blue">Puede ir en el mix</span> aparece en “Armá tu mix”. Hace falta que haya al menos dos productos con esto prendido.</p>
+        <h3>Fotos</h3>
+        <p>Tocá <strong>Cambiar foto</strong> y usá la cámara o la galería. Se achica sola (máximo 1400 px) antes de subir. No hace falta editarla en la compu.</p>
+        <div class="warn">
+          <b>Cuidado con Eliminar</b>
+          Eso saca el producto de la web. Si solo se te acabó esta semana, apagá el interruptor de stock. Es más fácil de volver atrás.
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Sabor del Chipá Casereño</span><b>04</b></div>
+  </section>
+
+  <!-- PÁGINA 5 -->
+  <section class="page">
+    <p class="kicker">El panel · Negocio y cuenta</p>
+    <h2>Avisos, envíos<br>y <em>WhatsApp</em></h2>
+    <p>La pestaña <strong>Negocio</strong> es la que más vas a usar cuando cambia la semana. Guardá siempre al final.</p>
+    <hr class="rule">
+
+    <table>
+      <tr><th>Campo</th><th>Qué pone</th></tr>
+      <tr><td><b>WhatsApp</b></td><td>Solo números, con código de país. Celular argentino: <strong>54 9</strong> + característica <em>sin 0</em> + número <em>sin 15</em>. Ejemplo: <strong>5491149896364</strong>. Hay un link “Probar el WhatsApp” para chequearlo.</td></tr>
+      <tr><td><b>Instagram</b></td><td>El link completo, tipo https://www.instagram.com/sabordelchipa/</td></tr>
+      <tr><td><b>Zona</b></td><td>Hoy: CABA. Si más adelante llegan a otra zona, lo cambiás acá.</td></tr>
+      <tr><td><b>Días y horarios</b></td><td>Lo que se lee en Envíos. Podés agregar o sacar días.</td></tr>
+      <tr><td><b>Opciones al pedir</b></td><td>Una por línea. Son las que el cliente elige en “Día de entrega”.</td></tr>
+      <tr><td><b>Precios actualizados en</b></td><td>Un texto corto: “octubre 2026”. Tranquiliza a quien duda si el precio es viejo.</td></tr>
+      <tr><td><b>Cartel de aviso</b></td><td>La barrita dorada arriba de toda la web. Si lo dejás vacío, no se muestra.</td></tr>
+    </table>
+
+    <div class="ok">
+      <b>El cartel es tu mejor amigo</b>
+      “Esta semana no hay entregas el viernes”, “Feriado: retoman el lunes”, “Quedan pocas bolsas de relleno”. La gente lo ve apenas entra. Cuando pasa el aviso, borralo y guardá.
+    </div>
+
+    <h3>Cuenta</h3>
+    <p>Ahí cambiás la contraseña (mínimo 8 caracteres) y cerrás sesión. Si entrás desde un celular prestado, cerrá sesión al terminar.</p>
+    <div class="note">
+      <b>Si te olvidás la contraseña</b>
+      Avisale a quien te armó la web. No hay un botón de “olvidé mi clave” a propósito: el panel es privado y no queremos que cualquiera se registre.
+    </div>
+    <div class="foot"><span>Sabor del Chipá Casereño</span><b>05</b></div>
+  </section>
+
+  <!-- PÁGINA 6 -->
+  <section class="page">
+    <p class="kicker">El día a día</p>
+    <h2>Recetas para<br>la <em>semana</em></h2>
+    <hr class="rule">
+
+    <div class="grid-2">
+      <article class="card">
+        <h3>Se te acabó un sabor</h3>
+        <p>Panel → Productos → apagá el interruptor. En la web queda gris y no se puede pedir. Cuando haya de nuevo, lo prendés.</p>
+      </article>
+      <article class="card">
+        <h3>Subieron los precios</h3>
+        <p>Editá cada producto, guardá, y en Negocio actualizá “Precios actualizados en”. Así nadie piensa que es de hace meses.</p>
+      </article>
+      <article class="card">
+        <h3>Hay feriado o viaje</h3>
+        <p>Escribí el cartel de aviso y, si hace falta, sacá ese día de las opciones de entrega. Cuando vuelvas, limpiá el cartel.</p>
+      </article>
+      <article class="card">
+        <h3>Sacaste una foto rica</h3>
+        <p>Entrá al producto y cambiá la foto desde el celular. Se ve mejor una foto de verdad que una genérica.</p>
+      </article>
+    </div>
+
+    <h3>Cosas que la web no dice (a propósito)</h3>
+    <p>No va a aparecer “sin TACC”, “libre de gluten” ni “apto celíacos”. En Argentina esa leyenda pide certificación. El chipá se hace con fécula de mandioca, pero sin sello no se puede afirmar.</p>
+
+    <h3>Si algo no carga</h3>
+    <ol class="steps">
+      <li><span class="dot">1</span><div><b>Recargá la página</b><span>A veces el celular se queda con una versión vieja. Cerrá y volvé a entrar.</span></div></li>
+      <li><span class="dot">2</span><div><b>Probá el panel de nuevo</b><span>Si dice que la sesión venció, es normal. Entrá otra vez con mail y contraseña.</span></div></li>
+      <li><span class="dot">3</span><div><b>La vidriera no se queda muda</b><span>Si un día la base está en pausa, la web sigue mostrando el último catálogo que tenía. Los pedidos por WhatsApp no se cortan.</span></div></li>
+    </ol>
+    <div class="foot"><span>Sabor del Chipá Casereño</span><b>06</b></div>
+  </section>
+
+  <!-- PÁGINA 7 -->
+  <section class="page">
+    <p class="kicker">Para tener a mano</p>
+    <h2>Lo que no hace falta<br>que <em>toques</em></h2>
+    <p>La web ya está publicada. No tenés que instalar nada ni “subir archivos”. Si alguien te pide la clave secreta de la base o te manda un link raro al panel, no entres: el panel solo vive en la dirección de esta guía.</p>
+    <hr class="rule">
+
+    <div class="cols">
+      <div>
+        <h3>Ahora mismo</h3>
+        <ul class="clean">
+          <li>Guardá las dos direcciones en el celular.</li>
+          <li>Entrá al panel y <strong>probá el link de WhatsApp</strong>.</li>
+          <li>Revisá que los precios de cada bolsa sean los de hoy.</li>
+          <li>Si esta semana hay un receso, poné el cartel.</li>
+        </ul>
+        <h3>Más adelante, si quieren</h3>
+        <ul class="clean">
+          <li>Un dominio propio, tipo <strong>sabordelchipa.com.ar</strong> (se gestiona en NIC Argentina y se apunta a la web).</li>
+          <li>Cuando tengan esa dirección final, la foto que aparece al compartir el link por WhatsApp se puede dejar fija.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Tus direcciones</h3>
+          <p>Vidriera</p>
+          <span class="url">https://sabordelchipa.vercel.app</span>
+          <p style="margin-top:10px">Panel (privado)</p>
+          <span class="url">https://sabordelchipa.vercel.app/admin</span>
+          <p style="margin-top:10px">Instagram</p>
+          <span class="url">instagram.com/sabordelchipa</span>
+        </div>
+        <div class="note" style="margin-top:12px">
+          <b>Una sola idea para llevarse</b>
+          Vos cocinás y coordinás. La web muestra el menú. WhatsApp cierra el pedido. El panel es el cuaderno donde actualizás el menú.
+        </div>
+      </div>
+    </div>
+
+    <div class="ok">
+      <b>Si necesitás una mano</b>
+      Escribile a quien te dejó esta guía. Con una captura de lo que ves en el celular alcanza: no hace falta explicar términos técnicos.
+    </div>
+
+    <p style="margin-top:22px;font-family:var(--display);font-size:16pt;color:var(--ink)">Que no falte el chipá en el freezer.</p>
+    <p style="color:var(--muted);font-size:9pt;margin:0">Sabor del Chipá Casereño · Hecho en Buenos Aires · Guía de uso, octubre 2026</p>
+    <div class="foot"><span>Sabor del Chipá Casereño</span><b>07</b></div>
+  </section>
+
+</body>
+</html>
