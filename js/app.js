@@ -30,7 +30,7 @@
 
   // ---------- datos del negocio ----------
   function applySettings() {
-    $$('[data-wa-link]').forEach(a => a.href = waBase() + '?text=' + encodeURIComponent('¡Hola! Quiero hacer una consulta sobre el chipá 🧉'));
+    $$('[data-wa-link]').forEach(a => a.href = waBase() + '?text=' + encodeURIComponent('¡Hola! Quiero hacer una consulta sobre el chipá.'));
     $$('[data-ig-link]').forEach(a => { a.href = S.instagram || '#'; a.hidden = !S.instagram; });
     $$('[data-updated]').forEach(el => el.textContent = S.precios_actualizados ? ` (actualizados en ${S.precios_actualizados})` : '');
     $$('[data-zone]').forEach(el => el.textContent = S.zona || 'CABA');
@@ -192,25 +192,37 @@
     const err = $('#formError');
     if (!nombre || !dir) { err.textContent = 'Completá tu nombre y tu barrio o dirección.'; err.hidden = false; return; }
     err.hidden = true;
-    const lines = cart.map(c => {
+    // Mensaje prolijo para WhatsApp: sin emojis (algunos WhatsApp Web los rompen) y con *negritas*
+    const pedidoN = Date.now().toString(36).slice(-4).toUpperCase();
+    const items = cart.map(c => {
       const info = lineInfo(c);
-      const price = info.unit != null ? money(info.unit * c.qty) : 'precio a confirmar';
-      const size = c.id === 'mix' ? '' : ` (${sizeLabel(c.size)})`;
-      return `• ${c.qty} × ${info.nombre}${size}${c.opt ? ' — ' + c.opt : ''}: ${price}`;
+      const precio = info.unit != null ? money(info.unit * c.qty) : 'a confirmar';
+      const opt = c.opt ? c.opt.charAt(0).toLowerCase() + c.opt.slice(1) : '';
+      const detalle = c.id === 'mix' ? c.opt : [sizeLabel(c.size), opt].filter(Boolean).join(', ');
+      return `• ${c.qty} × ${info.nombre}${detalle ? ` (${detalle})` : ''} — ${precio}`;
     });
     const total = cart.reduce((a, c) => a + (lineInfo(c).unit || 0) * c.qty, 0);
     const pending = cart.some(c => lineInfo(c).unit == null);
     const notas = String(f.get('notas') || '').trim();
     const msg = [
-      '¡Hola! Quiero hacer un pedido 🧀🧉', '',
-      ...lines, '',
-      `Total productos: ${money(total)}${pending ? ' + lo que hay que confirmar' : ''} (envío a coordinar)`, '',
+      '¡Hola! Quiero hacer un pedido a *Sabor del Chipá*.',
+      `Pedido N.º ${pedidoN}`,
+      '',
+      '*Productos*',
+      ...items,
+      '',
+      `*Total: ${money(total)}*${pending ? ' + lo que queda a confirmar' : ''}`,
+      'El envío lo coordinamos por acá.',
+      '',
+      '*Datos de entrega*',
       `Nombre: ${nombre}`,
-      `Dirección / barrio: ${dir}`,
-      `Entrega: ${f.get('entrega')}`,
+      `Dirección: ${dir}`,
+      `Día: ${f.get('entrega')}`,
       `Pago: ${f.get('pago')}`,
-      notas ? `Notas: ${notas}` : ''
-    ].filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n').trim();
+      ...(notas ? [`Notas: ${notas}`] : []),
+      '',
+      '¡Gracias!'
+    ].join('\n');
     window.open(waBase() + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
   });
 

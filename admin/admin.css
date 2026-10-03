@@ -1,5 +1,5 @@
-@font-face { font-family: 'Playfair Display'; src: url('../fonts/playfair-display-latin-wght-italic.woff2') format('woff2'); font-weight: 400 900; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Montserrat'; src: url('../fonts/montserrat-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Playfair Display'; src: url('/fonts/playfair-display-latin-wght-italic.woff2') format('woff2'); font-weight: 400 900; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Montserrat'; src: url('/fonts/montserrat-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
 :root {
   --cream: #FBF6EC; --cream-2: #F3E9D6; --paper: #FFFDF8; --ink: #2B1E16; --ink-2: #5E4838; --muted: #8A7463;
   --gold: #B98A2E; --celeste: #74ACDF; --danger: #B3261E; --ok: #2F7D4F; --line: rgba(43, 30, 22, .14);

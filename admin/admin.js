@@ -8,7 +8,7 @@
   const D = window.SABOR_DEFAULTS;
   const money = n => (n == null ? '—' : '$' + Number(n).toLocaleString('es-AR'));
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const imgSrc = v => !v ? '../img/logo-200.png' : /^(https?:|data:|blob:)/.test(v) ? v : '../' + String(v).replace(/^\/+/, '');
+  const imgSrc = v => !v ? '/img/logo-200.png' : /^(https?:|data:|blob:)/.test(v) ? v : '/' + String(v).replace(/^\/+/, '');
   const digits = v => String(v ?? '').replace(/\D/g, '');
   const price = v => { const d = digits(v); return d ? parseInt(d, 10) : null; };
   const lines = v => String(v || '').split('\n').map(s => s.trim()).filter(Boolean);

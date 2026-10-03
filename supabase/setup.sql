@@ -14,10 +14,10 @@ create or replace function public.is_admin()
 returns boolean
 language sql
 stable
-security definer
-set search_path = public
+security invoker
+set search_path = ''
 as $$
-  select exists (select 1 from public.admins where user_id = auth.uid());
+  select exists (select 1 from public.admins where user_id = (select auth.uid()));
 $$;
 
 -- ---------- 2. Datos del negocio (una sola fila) ----------
@@ -53,14 +53,14 @@ create table if not exists public.products (
 
 -- fecha de modificación automática
 create or replace function public.touch_updated_at()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = '' as $$
 begin new.updated_at = now(); return new; end; $$;
 
 drop trigger if exists products_touch on public.products;
-create trigger products_touch before update on public.products
+create or replace trigger products_touch before update on public.products
   for each row execute function public.touch_updated_at();
 drop trigger if exists settings_touch on public.settings;
-create trigger settings_touch before update on public.settings
+create or replace trigger settings_touch before update on public.settings
   for each row execute function public.touch_updated_at();
 
 -- ---------- 4. Seguridad (Row Level Security) ----------
@@ -72,27 +72,29 @@ grant usage on schema public to anon, authenticated;
 grant select on public.settings, public.products to anon, authenticated;
 grant insert, update, delete on public.products to authenticated;
 grant insert, update on public.settings to authenticated;
-grant execute on function public.is_admin() to anon, authenticated;
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+grant select on public.admins to authenticated;
 
 drop policy if exists "admins: ver la propia fila" on public.admins;
 create policy "admins: ver la propia fila" on public.admins
-  for select to authenticated using (user_id = auth.uid());
+  for select to authenticated using (user_id = (select auth.uid()));
 
 drop policy if exists "settings: lectura pública" on public.settings;
 create policy "settings: lectura pública" on public.settings for select using (true);
 drop policy if exists "settings: admin crea" on public.settings;
-create policy "settings: admin crea" on public.settings for insert to authenticated with check (public.is_admin());
+create policy "settings: admin crea" on public.settings for insert to authenticated with check ((select public.is_admin()));
 drop policy if exists "settings: admin edita" on public.settings;
-create policy "settings: admin edita" on public.settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "settings: admin edita" on public.settings for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
 
 drop policy if exists "products: lectura pública" on public.products;
 create policy "products: lectura pública" on public.products for select using (true);
 drop policy if exists "products: admin crea" on public.products;
-create policy "products: admin crea" on public.products for insert to authenticated with check (public.is_admin());
+create policy "products: admin crea" on public.products for insert to authenticated with check ((select public.is_admin()));
 drop policy if exists "products: admin edita" on public.products;
-create policy "products: admin edita" on public.products for update to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "products: admin edita" on public.products for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
 drop policy if exists "products: admin borra" on public.products;
-create policy "products: admin borra" on public.products for delete to authenticated using (public.is_admin());
+create policy "products: admin borra" on public.products for delete to authenticated using ((select public.is_admin()));
 
 -- ---------- 5. Fotos (Storage) ----------
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -101,13 +103,13 @@ on conflict (id) do update set public = true;
 
 drop policy if exists "fotos: admin sube" on storage.objects;
 create policy "fotos: admin sube" on storage.objects
-  for insert to authenticated with check (bucket_id = 'fotos' and public.is_admin());
+  for insert to authenticated with check (bucket_id = 'fotos' and (select public.is_admin()));
 drop policy if exists "fotos: admin actualiza" on storage.objects;
 create policy "fotos: admin actualiza" on storage.objects
-  for update to authenticated using (bucket_id = 'fotos' and public.is_admin());
+  for update to authenticated using (bucket_id = 'fotos' and (select public.is_admin()));
 drop policy if exists "fotos: admin borra" on storage.objects;
 create policy "fotos: admin borra" on storage.objects
-  for delete to authenticated using (bucket_id = 'fotos' and public.is_admin());
+  for delete to authenticated using (bucket_id = 'fotos' and (select public.is_admin()));
 
 -- ---------- 6. Datos iniciales (lo que hoy está en Instagram) ----------
 insert into public.settings (id, whatsapp, instagram, zona, dias, opciones_entrega, precios_actualizados, aviso) values
