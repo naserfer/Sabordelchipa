@@ -285,6 +285,7 @@ button { font: inherit; color: inherit; }
 .cloud::before { width: 40px; height: 40px; left: 14px; top: -18px; }
 .cloud::after { width: 30px; height: 30px; left: 46px; top: -12px; }
 .c1 { left: 12%; top: 22%; } .c2 { left: 62%; top: 12%; transform: scale(.7); }
+.flag-cloth { transform-box: fill-box; transform-origin: left center; }
 .road-line { position: absolute; left: 0; right: 0; bottom: 56px; height: 4px; background: repeating-linear-gradient(90deg, var(--ink) 0 26px, transparent 26px 46px); opacity: .25; }
 .road::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 58px; background: #E4C892; }
 .rider { position: absolute; bottom: 44px; left: 0; width: 170px; height: 120px; z-index: 2; transform: translateX(-200px); }

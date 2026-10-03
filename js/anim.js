@@ -349,6 +349,20 @@
     animate('.wheel', { rotate: '1turn', duration: 500, loop: true, ease: 'linear' });
     animate('.puff', { opacity: [{ to: .9, duration: 120 }, { to: 0, duration: 680 }], scale: [.4, 2.2], x: [0, -46], y: [0, -16], duration: 800, loop: true, delay: stagger(260), ease: 'outQuad' });
     animate('.cloud', { x: [0, 30], duration: 6000, alternate: true, loop: true, ease: 'inOutSine', delay: stagger(1200) });
+    const flagA = {
+      b1: 'M324 16 C336 14 344 17 352 14 L350 21 C342 23 334 20 324 22 Z',
+      w:  'M324 22 C336 20 344 23 350 21 L348 28 C340 30 332 27 324 28 Z',
+      b2: 'M324 28 C336 26 344 29 348 28 L346 35 C338 36 330 33 324 34 Z'
+    };
+    const flagB = {
+      b1: 'M324 16 C336 19 344 15 352 18 L350 24 C342 22 334 25 324 22 Z',
+      w:  'M324 22 C336 25 344 21 350 24 L348 30 C340 28 332 31 324 28 Z',
+      b2: 'M324 28 C336 31 344 27 348 31 L346 37 C338 34 330 36 324 34 Z'
+    };
+    animate('.flag-b1', { d: [flagA.b1, flagB.b1], duration: 780, alternate: true, loop: true, ease: 'inOutSine' });
+    animate('.flag-w', { d: [flagA.w, flagB.w], duration: 780, alternate: true, loop: true, ease: 'inOutSine' });
+    animate('.flag-b2', { d: [flagA.b2, flagB.b2], duration: 780, alternate: true, loop: true, ease: 'inOutSine' });
+    animate('.flag-cloth', { rotate: [-6, 8], duration: 1100, alternate: true, loop: true, ease: 'inOutSine' });
   });
 
   /* ---------------------------------------------------------
