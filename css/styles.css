@@ -448,11 +448,14 @@ html.has-aviso { --aviso-h: 40px; }
   .hero-title .line-em { display: block; }
   .hero-sub { display: none; }
   .eyebrow { margin-bottom: 6px; font-size: 11px; }
-  .steps { display: flex; gap: 6px; margin-bottom: 14px; }
+  .steps { display: flex; gap: 6px; margin-bottom: 14px; position: relative; padding-bottom: 60px; }
   .step { padding: 6px; transform: none !important; flex: none; }
   .step .step-t { display: none; }
-  .step.is-active { flex: 1; padding: 6px 12px 6px 6px; }
-  .step.is-active .step-t { display: flex; }
+  .step.is-active { background: none; box-shadow: none; }
+  .step.is-active .step-t {
+    display: flex; position: absolute; left: 0; right: 0; bottom: 0; min-height: 54px; justify-content: center;
+    padding: 8px 14px; border-radius: 14px; background: var(--paper); box-shadow: var(--shadow-sm);
+  }
   .step-t small { font-size: 12px; }
   .oven-copy .hero-cta .btn { min-height: 44px; font-size: 14px; }
   .hud { padding: 7px 10px 9px; min-width: 92px; border-radius: 14px; }
@@ -479,7 +482,7 @@ html.has-aviso { --aviso-h: 40px; }
   .hero-cta .btn { flex: 1; }
   .final-cta .hero-cta { flex-direction: column; width: 100%; }
 }
-@media (max-height: 640px) and (max-width: 860px) {
+@media (max-height: 700px) and (max-width: 860px) {
   .oven-visual { width: min(100%, 40svh); }
 }
 
