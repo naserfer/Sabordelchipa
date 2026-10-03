@@ -9,6 +9,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches;
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
   const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -89,49 +90,81 @@
   };
   const st = { frost: 1, oven: 0, glow: 0, heat: 0, puff: 0, temp: -18, time: 0, steam: 0 };
   let lastStep = -1;
+  const prev = { puff: NaN, heat: NaN, oven: NaN, glow: NaN, frost: NaN, steam: NaN, temp: NaN, time: NaN, rodGlow: false, bg: '' };
 
   function render(progress) {
     if (!el.body) return;
-    const pts = RAW.map((p, i) => [lerp(p[0], BAKED[i][0], st.puff), lerp(p[1], BAKED[i][1], st.puff)]);
-    const d = pathFrom(pts);
-    el.body.setAttribute('d', d); el.crust.setAttribute('d', d); el.clip.setAttribute('d', d);
+    if (Number.isNaN(prev.puff) || Math.abs(st.puff - prev.puff) > .001) {
+      prev.puff = st.puff;
+      const pts = RAW.map((p, i) => [lerp(p[0], BAKED[i][0], st.puff), lerp(p[1], BAKED[i][1], st.puff)]);
+      const d = pathFrom(pts);
+      el.body.setAttribute('d', d); el.crust.setAttribute('d', d); el.clip.setAttribute('d', d);
+      el.shadow.setAttribute('rx', lerp(104, 132, st.puff).toFixed(1));
+    }
 
-    const h = easeInOut(clamp(st.heat));
-    el.s0.setAttribute('stop-color', mix('#FBF4E2', '#FBD891', h));
-    el.s1.setAttribute('stop-color', mix('#EFE3C6', '#E7A955', h));
-    el.s2.setAttribute('stop-color', mix('#D8C6A0', '#B8692A', h));
-    el.crust.setAttribute('opacity', (Math.pow(h, 1.4) * .9).toFixed(3));
-    el.tex.setAttribute('opacity', (.14 + h * .26).toFixed(3));
-    el.rim.setAttribute('opacity', (st.glow * .85).toFixed(3));
-    const spotFill = mix('#F4E4B4', '#B4561A', h);
-    el.spots.forEach(s => s.setAttribute('fill', spotFill));
+    if (Number.isNaN(prev.heat) || Math.abs(st.heat - prev.heat) > .004) {
+      prev.heat = st.heat;
+      const h = easeInOut(clamp(st.heat));
+      el.s0.setAttribute('stop-color', mix('#FBF4E2', '#FBD891', h));
+      el.s1.setAttribute('stop-color', mix('#EFE3C6', '#E7A955', h));
+      el.s2.setAttribute('stop-color', mix('#D8C6A0', '#B8692A', h));
+      el.crust.setAttribute('opacity', (Math.pow(h, 1.4) * .9).toFixed(3));
+      el.tex.setAttribute('opacity', (.14 + h * .26).toFixed(3));
+      const spotFill = mix('#F4E4B4', '#B4561A', h);
+      el.spots.forEach(s => s.setAttribute('fill', spotFill));
+    }
 
-    el.frost.setAttribute('opacity', st.frost.toFixed(3));
-    el.snow.setAttribute('opacity', st.frost.toFixed(3));
-    el.bgOven.setAttribute('opacity', st.oven.toFixed(3));
-    el.glow.setAttribute('opacity', st.glow.toFixed(3));
-    el.rods.setAttribute('opacity', st.oven.toFixed(3));
-    const rodC = mix('#4A2512', '#FF7A22', clamp(st.glow * 1.2));
-    el.rodPaths.forEach(r => { r.style.stroke = rodC; r.setAttribute('filter', st.glow > .3 ? 'url(#fRodGlow)' : ''); });
-    const rackC = mix('#E9F2F7', '#3B2416', st.oven);
-    el.rackLine.setAttribute('stroke', rackC); el.rackBars.setAttribute('stroke', rackC);
-    el.frame.setAttribute('stroke-opacity', (st.oven * .55).toFixed(3));
-    el.shine.setAttribute('opacity', (st.oven * .05).toFixed(3));
-    el.shadow.setAttribute('rx', lerp(104, 132, st.puff).toFixed(1));
-    el.shadow.setAttribute('opacity', lerp(.16, .5, st.oven).toFixed(3));
-    el.steamG.setAttribute('opacity', st.steam.toFixed(3));
-    el.embers.setAttribute('opacity', clamp(st.glow * 1.1).toFixed(3));
-    el.sun.setAttribute('opacity', (st.steam * .72).toFixed(3));
+    if (st.frost !== prev.frost) {
+      prev.frost = st.frost;
+      el.frost.setAttribute('opacity', st.frost.toFixed(3));
+      el.snow.setAttribute('opacity', st.frost.toFixed(3));
+    }
+    if (st.oven !== prev.oven) {
+      prev.oven = st.oven;
+      el.bgOven.setAttribute('opacity', st.oven.toFixed(3));
+      el.rods.setAttribute('opacity', st.oven.toFixed(3));
+      const rackC = mix('#E9F2F7', '#3B2416', st.oven);
+      el.rackLine.setAttribute('stroke', rackC); el.rackBars.setAttribute('stroke', rackC);
+      el.frame.setAttribute('stroke-opacity', (st.oven * .55).toFixed(3));
+      el.shine.setAttribute('opacity', (st.oven * .05).toFixed(3));
+      el.shadow.setAttribute('opacity', lerp(.16, .5, st.oven).toFixed(3));
+      const bg = mix('#FBF6EC', '#F6E7CF', st.oven);
+      if (bg !== prev.bg) { prev.bg = bg; el.sticky.style.setProperty('background-color', bg); }
+    }
+    if (st.glow !== prev.glow) {
+      prev.glow = st.glow;
+      el.rim.setAttribute('opacity', (st.glow * .85).toFixed(3));
+      el.glow.setAttribute('opacity', st.glow.toFixed(3));
+      el.embers.setAttribute('opacity', clamp(st.glow * 1.1).toFixed(3));
+      const rodC = mix('#4A2512', '#FF7A22', clamp(st.glow * 1.2));
+      const wantGlow = !coarse && st.glow > .3;
+      el.rodPaths.forEach(r => {
+        r.style.stroke = rodC;
+        if (wantGlow !== prev.rodGlow) r.setAttribute('filter', wantGlow ? 'url(#fRodGlow)' : '');
+      });
+      prev.rodGlow = wantGlow;
+    }
+    if (st.steam !== prev.steam) {
+      prev.steam = st.steam;
+      el.steamG.setAttribute('opacity', st.steam.toFixed(3));
+      el.sun.setAttribute('opacity', (st.steam * .72).toFixed(3));
+    }
 
     const t = Math.round(st.temp);
-    el.temp.textContent = Math.abs(t); el.minus.style.display = t < 0 ? '' : 'none';
-    el.thermo.style.width = (4 + clamp((st.temp + 18) / 218) * 96).toFixed(1) + '%';
-    el.time.textContent = Math.round(st.time);
-    el.ring.style.strokeDashoffset = (113.1 * (1 - clamp(st.time / 20))).toFixed(2);
-    el.sticky.style.setProperty('background-color', mix('#FBF6EC', '#F6E7CF', st.oven));
+    if (t !== prev.temp) {
+      prev.temp = t;
+      el.temp.textContent = Math.abs(t); el.minus.style.display = t < 0 ? '' : 'none';
+      el.thermo.style.width = (4 + clamp((t + 18) / 218) * 96).toFixed(1) + '%';
+    }
+    const tm = Math.round(st.time);
+    if (tm !== prev.time) {
+      prev.time = tm;
+      el.time.textContent = tm;
+      el.ring.style.strokeDashoffset = (113.1 * (1 - clamp(tm / 20))).toFixed(2);
+    }
 
     if (progress != null) {
-      el.progress.style.width = (progress * 100).toFixed(2) + '%';
+      el.progress.style.width = (progress * 100).toFixed(1) + '%';
       const step = progress < .16 ? 0 : progress < .36 ? 1 : progress < .86 ? 2 : 3;
       if (step !== lastStep) {
         el.steps.forEach((s, i) => { s.classList.toggle('is-active', i === step); s.classList.toggle('is-done', i < step); });
@@ -153,8 +186,11 @@
     const steam = svg.createDrawable('.steam');
     const tl = createTimeline({
       defaults: { ease: 'linear' },
-      autoplay: onScroll({ target: '#horno', enter: 'top top', leave: 'bottom bottom', sync: .18 }),
-      onUpdate: self => render(self.progress)
+      autoplay: onScroll({ target: '#horno', enter: 'top top', leave: 'bottom bottom', sync: coarse ? true : .18 }),
+      onUpdate: self => {
+        render(self.progress);
+        if (self.progress > .22) startOvenAmbient();
+      }
     });
     tl
       // 1) sale del freezer: se va la escarcha y caen los copos
@@ -178,16 +214,21 @@
       .add(st, { glow: .95, duration: 120 }, 880)
       .add('#sunRays', { scale: [.55, 1], duration: 140, ease: 'outBack(2)' }, 860);
 
-    // loops ambientales (no dependen del scroll)
-    animate('.steam', { x: [-5, 5], duration: 1600, alternate: true, loop: true, ease: 'inOutSine', delay: stagger(260) });
-    animate('#snow .flake', { rotate: '1turn', duration: 14000, loop: true, ease: 'linear' });
-    animate('#sunRays', { rotate: '1turn', duration: 40000, loop: true, ease: 'linear' });
-    animate('.ember', {
-      y: () => utils.random(-320, -180), x: () => utils.random(-30, 30),
-      opacity: [{ to: 1, duration: 300 }, { to: 0, duration: 1500 }],
-      scale: [1, .3], duration: () => utils.random(1600, 2600), delay: () => utils.random(0, 2000),
-      loop: true, ease: 'outSine'
-    });
+    // loops ambientales: en el celular no arrancan hasta que el horno ya se ve
+    if (!coarse) animate('#snow .flake', { rotate: '1turn', duration: 14000, loop: true, ease: 'linear' });
+    let ovenAmbient = false;
+    function startOvenAmbient() {
+      if (ovenAmbient) return;
+      ovenAmbient = true;
+      animate('.steam', { x: [-5, 5], duration: 1600, alternate: true, loop: true, ease: 'inOutSine', delay: stagger(260) });
+      animate('#sunRays', { rotate: '1turn', duration: 40000, loop: true, ease: 'linear' });
+      animate('.ember', {
+        y: () => utils.random(-320, -180), x: () => utils.random(-30, 30),
+        opacity: [{ to: 1, duration: 300 }, { to: 0, duration: 1500 }],
+        scale: [1, .3], duration: () => utils.random(1600, 2600), delay: () => utils.random(0, 2000),
+        loop: true, ease: 'outSine'
+      });
+    }
     // el horno sigue el mouse con una leve inclinación 3D
     if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
       const vis = $('.oven-visual');

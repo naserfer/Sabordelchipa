@@ -147,8 +147,8 @@ button { font: inherit; color: inherit; }
 .step-t small { font-size: 13px; color: var(--muted); }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; }
 
-.oven-visual { position: relative; width: 100%; max-width: 620px; justify-self: center; aspect-ratio: 1; }
-#ovenSvg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 30px 40px rgba(43, 30, 22, .25)); }
+.oven-visual { position: relative; width: 100%; max-width: 620px; justify-self: center; aspect-ratio: 1; border-radius: 12%; box-shadow: 0 28px 44px -16px rgba(43, 30, 22, .32); }
+#ovenSvg { width: 100%; height: 100%; overflow: visible; display: block; }
 #ovenSvg .svg-label { font: 700 13px var(--sans); letter-spacing: .2em; }
 #chipa, #chipaInner, .spot, .flake, .ember { transform-box: fill-box; transform-origin: center; }
 #chipa { transform-origin: 50% 85%; }
