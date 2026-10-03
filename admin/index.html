@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel · Sabor del Chipá</title>
+  <meta name="theme-color" content="#2B1E16">
+  <link rel="icon" type="image/png" href="../img/favicon.png">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- ========== LOGIN ========== -->
+  <main class="login" id="viewLogin" hidden>
+    <form class="login-card" id="loginForm" novalidate>
+      <img src="../img/logo-200.png" alt="Sabor del Chipá" width="96" height="96">
+      <h1>Panel del negocio</h1>
+      <p class="muted">Entrá para cambiar productos, fotos, precios y datos.</p>
+      <label>Mail<input type="email" name="email" autocomplete="username" required></label>
+      <label>Contraseña
+        <span class="pw"><input type="password" name="password" autocomplete="current-password" required><button type="button" class="pw-toggle" aria-label="Mostrar contraseña">👁</button></span>
+      </label>
+      <p class="error" id="loginError" role="alert" hidden></p>
+      <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+      <a class="muted small" href="../">← Volver a la web</a>
+    </form>
+  </main>
+
+  <!-- ========== SIN CONFIGURAR ========== -->
+  <main class="login" id="viewSetup" hidden>
+    <div class="login-card">
+      <img src="../img/logo-200.png" alt="" width="96" height="96">
+      <h1>Falta conectar la base de datos</h1>
+      <p class="muted">Completá <code>supabaseUrl</code> y <code>supabaseKey</code> en <code>js/config.js</code> y volvé a subir la web. Los pasos están en el README.</p>
+      <a class="btn btn-primary btn-block" href="../">Volver a la web</a>
+    </div>
+  </main>
+
+  <!-- ========== PANEL ========== -->
+  <div class="app" id="viewApp" hidden>
+    <header class="topbar">
+      <div class="tb-brand"><img src="../img/logo-200.png" alt="" width="36" height="36"><span>Panel</span></div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" class="tab is-active" data-tab="productos" aria-selected="true">Productos</button>
+        <button role="tab" class="tab" data-tab="negocio" aria-selected="false">Negocio</button>
+        <button role="tab" class="tab" data-tab="cuenta" aria-selected="false">Cuenta</button>
+      </nav>
+      <a class="btn btn-ghost btn-sm tb-web" href="../" target="_blank" rel="noopener">Ver la web ↗</a>
+    </header>
+
+    <!-- Productos -->
+    <section class="panel" id="tab-productos">
+      <div class="panel-head">
+        <div><h2>Productos</h2><p class="muted small">Tocá un producto para editarlo. El interruptor marca si hay stock.</p></div>
+        <button class="btn btn-primary" type="button" id="newProduct">＋ Nuevo</button>
+      </div>
+      <ul class="plist" id="plist"></ul>
+    </section>
+
+    <!-- Negocio -->
+    <section class="panel" id="tab-negocio" hidden>
+      <div class="panel-head"><div><h2>Datos del negocio</h2><p class="muted small">Se actualizan en la web apenas guardás.</p></div></div>
+      <form class="form" id="settingsForm" novalidate>
+        <fieldset>
+          <legend>Contacto</legend>
+          <label>WhatsApp (con código de país, solo números)
+            <input name="whatsapp" inputmode="numeric" placeholder="5491112345678" required>
+            <small class="muted">Argentina celular: 54 9 + característica sin 0 + número sin 15. Ej.: 5491149896364</small>
+          </label>
+          <a class="small" id="waTest" href="#" target="_blank" rel="noopener">Probar el link de WhatsApp ↗</a>
+          <label>Instagram (link)<input name="instagram" type="url" placeholder="https://www.instagram.com/..."></label>
+        </fieldset>
+        <fieldset>
+          <legend>Envíos</legend>
+          <label>Zona de cobertura<input name="zona" placeholder="CABA"></label>
+          <div class="field-label">Días y horarios</div>
+          <div class="rows" id="diasRows"></div>
+          <button class="btn btn-ghost btn-sm" type="button" id="addDia">＋ Agregar día</button>
+          <label>Opciones para elegir al pedir (una por línea)<textarea name="opciones_entrega" rows="5"></textarea></label>
+        </fieldset>
+        <fieldset>
+          <legend>Avisos</legend>
+          <label>Precios actualizados en (texto)<input name="precios_actualizados" placeholder="julio 2026"></label>
+          <label>Cartel de aviso arriba de la web (dejalo vacío para no mostrar nada)
+            <textarea name="aviso" rows="2" placeholder="Ej.: Esta semana no hay entregas el viernes 🙏"></textarea></label>
+        </fieldset>
+        <div class="sticky-save"><button class="btn btn-primary btn-block" type="submit">Guardar cambios</button></div>
+      </form>
+    </section>
+
+    <!-- Cuenta -->
+    <section class="panel" id="tab-cuenta" hidden>
+      <div class="panel-head"><div><h2>Cuenta</h2><p class="muted small" id="accountEmail"></p></div></div>
+      <form class="form" id="pwForm" novalidate>
+        <fieldset>
+          <legend>Cambiar contraseña</legend>
+          <label>Nueva contraseña<input type="password" name="pw1" autocomplete="new-password" minlength="8" required></label>
+          <label>Repetila<input type="password" name="pw2" autocomplete="new-password" minlength="8" required></label>
+          <button class="btn btn-primary" type="submit">Cambiar contraseña</button>
+        </fieldset>
+      </form>
+      <button class="btn btn-ghost" type="button" id="logout">Cerrar sesión</button>
+    </section>
+  </div>
+
+  <!-- ========== EDITOR DE PRODUCTO ========== -->
+  <div class="sheet-bg" id="sheetBg" hidden></div>
+  <aside class="sheet" id="sheet" aria-label="Editar producto" hidden>
+    <form class="form" id="productForm" novalidate>
+      <div class="sheet-head">
+        <h2 id="sheetTitle">Editar producto</h2>
+        <button class="icon-btn" type="button" id="closeSheet" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="photo">
+        <img id="photoPreview" alt="" src="../img/logo-200.png">
+        <label class="btn btn-ghost btn-sm photo-btn">📷 Cambiar foto<input type="file" id="photoInput" accept="image/*" hidden></label>
+        <small class="muted">Se achica sola antes de subir (máx. 1400 px).</small>
+      </div>
+      <label>Nombre<input name="nombre" required maxlength="60"></label>
+      <label>Descripción<textarea name="descripcion" rows="3" maxlength="240"></textarea></label>
+      <div class="two">
+        <label>Precio ½ kg ($)<input name="precio_medio" inputmode="numeric" placeholder="12000"></label>
+        <label>Precio 1 kg ($)<input name="precio_kilo" inputmode="numeric" placeholder="20000"></label>
+      </div>
+      <label>Cantidad aproximada (opcional)<input name="unidades" placeholder="≈ 15 unidades por ½ kg"></label>
+      <label>Etiquetas (separadas por coma)<input name="tags" placeholder="Tres quesos, Vegano"></label>
+      <label>Variedades / sabores para elegir (una por línea, opcional)<textarea name="opciones" rows="3"></textarea></label>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="disponible"> Hay stock</label>
+        <label class="check"><input type="checkbox" name="a_pedido"> Se hace a pedido</label>
+        <label class="check"><input type="checkbox" name="en_mix"> Puede ir en el mix</label>
+      </div>
+      <p class="error" id="productError" role="alert" hidden></p>
+      <div class="sheet-actions">
+        <button class="btn btn-danger" type="button" id="deleteProduct">Eliminar</button>
+        <button class="btn btn-primary" type="submit" id="saveProduct">Guardar</button>
+      </div>
+    </form>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="busy" id="busy" hidden><span></span></div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/sb.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
