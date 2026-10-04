@@ -14,7 +14,11 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
 
 ## Estructura
 
-- `index.html`: web pública con estas secciones: hero con animación "del freezer al horno" sincronizada al scroll, marquee, historia, mate y chipá, variedades, mix, anatomía, envíos, cómo pedir, FAQ, CTA final, carrito y aviso.
+- `index.html`: web pública con estas secciones: hero con animación "del freezer al horno" sincronizada al scroll, marquee, historia, mate y chipá, variedades (filtros por categoría + aviso de precio por más de 3 kg), mix, videos, anatomía, envíos, cómo pedir, FAQ, CTA final, carrito y aviso.
+  - El catálogo se agrupa como la carta: Clásicos, Formas especiales y Especiales (`CATS` en `app.js`). Un grupo con un solo producto muestra la tarjeta ancha.
+  - Cada tarjeta puede tener varias fotos (`img` + `fotos`): se deslizan con el dedo o con flechas.
+  - Sección `#videos`: los reels son HTML estático. Cada `<figure data-reel data-product="id" data-opt="sabor">` arma su botón "Sumar ½ kg" con el precio actual del producto. Se reproducen solos sin sonido al verse (no con `prefers-reduced-motion` ni ahorro de datos).
+  - El carrito suma los kilos; con más de 3 kg avisa y el mensaje de WhatsApp pide precio por cantidad.
 - `css/styles.css`: tokens de diseño en `:root`.
   - Paleta: crema, tinta, dorado y crust.
   - Identidad argentina: celeste `#74ACDF`, sol `#F6B40E`, rojo de filete `#C0392B`.
@@ -30,7 +34,8 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
   - CRUD de productos con subida de fotos (se achican en el navegador a 1400px JPG).
   - Datos del negocio y cambio de contraseña.
 - `supabase/setup.sql`: esquema completo y políticas. Es la fuente de verdad de la base.
-- `img/`: fotos del producto en webp + jpg.
+- `img/`: fotos del producto en webp + jpg (las nuevas, recortadas a 4:3 de 900×675).
+- `video/`: reels verticales 540×960 sin audio: `.mp4` (H.264, va primero), `.webm` (VP9, respaldo) y `.webp` (poster).
 
 ## Base de datos (Supabase)
 
@@ -39,7 +44,9 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
 - `products`:
   - `id text` (slug), `nombre`, `descripcion`, `unidades`.
   - `precio_medio int` y `precio_kilo int`; si es null, la web muestra "Consultar".
-  - `img`: ruta relativa `"img/x.webp"` o URL pública del bucket.
+  - `img`: foto principal, ruta relativa `"img/x.webp"` o URL pública del bucket.
+  - `fotos text[]`: fotos extra (mismo formato que `img`).
+  - `categoria text`: `clasicos` | `formas` | `especiales` (si viene otra cosa, se muestra en Especiales).
   - `tags text[]`, `opciones text[]`.
   - `a_pedido`, `disponible`, `en_mix` (bool), `orden int`.
 - `admins(user_id → auth.users)` y función `is_admin()` (SECURITY INVOKER).
@@ -70,6 +77,8 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
 
 ## Pendientes
 
-- Confirmar con el dueño los precios que no coinciden en Instagram: unidades por bolsa de galletitas y grisines, y el kilo de bohíos ($28.000 o $32.000).
+- Los precios, unidades y sabores salen de la carta de octubre 2026 (migración `20261004_carta_octubre.sql`).
+- Falta una foto de las Pizzetas de chipá (hoy la tarjeta muestra "Foto próximamente"). Se sube desde /admin.
+- Confirmar con el dueño: en el bohío de calabaza la carta dice "queso por salud"; en la web quedó "Port Salut".
 - Cuando haya dominio final: poner la URL absoluta en `og:image` de `index.html`.
 - Mantener activa la base (plan gratis): configurar un ping cada 2 días con cron-job.org a `/rest/v1/settings?select=id` con header `apikey`.

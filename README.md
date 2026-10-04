@@ -7,6 +7,8 @@
 
 Mientras la base no esté conectada, la web funciona igual con los datos de `js/data.js`.
 
+Para ver la web en tu compu antes de publicarla: doble clic en **`abrir-local.bat`** (usa Python o Node, lo que tengas) y se abre en http://localhost:8000.
+
 ---
 
 ## 1. Crear la base de datos gratis (Supabase)
@@ -69,7 +71,8 @@ En el plan gratis, Supabase pausa el proyecto si pasa unos 7 días sin actividad
 ## 6. Cómo usa el panel el dueño (desde el celular)
 
 - **Productos**:
-  - tocá uno para editar nombre, descripción, precios, variedades, etiquetas y foto;
+  - tocá uno para editar nombre, categoría (Clásicos, Formas especiales o Especiales), descripción, precios, variedades, etiquetas y fotos;
+  - **Más fotos**: podés sumar varias por producto; en la web se pasan deslizando. ★ pone una como principal y ✕ la saca;
   - el interruptor verde marca si hay stock;
   - ▲ ▼ cambian el orden en la web;
   - **＋ Nuevo** crea un producto;

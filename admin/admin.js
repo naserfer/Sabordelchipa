@@ -14,7 +14,13 @@
   const lines = v => String(v || '').split('\n').map(s => s.trim()).filter(Boolean);
   const slug = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'producto';
 
-  let products = [], settings = null, editing = null, pendingPhoto = null;
+  let products = [], settings = null, editing = null;
+  // fotos del producto que se está editando: la primera es la principal.
+  // { src: ruta o URL ya guardada } o { blob, preview } si todavía hay que subirla
+  let photos = [];
+  const CATS = [['clasicos', 'Clásicos'], ['formas', 'Formas especiales'], ['especiales', 'Especiales']];
+  const catIdx = p => { const i = CATS.findIndex(c => c[0] === p.categoria); return i < 0 ? CATS.length - 1 : i; };
+  const catName = p => CATS[catIdx(p)][1];
 
   /* ---------- utilidades de UI ---------- */
   function show(view) {
@@ -84,7 +90,7 @@
         SB.select('products', 'select=*&order=orden.asc,nombre.asc'),
         SB.select('settings', 'select=*&id=eq.1')
       ]);
-      products = p || [];
+      products = (p || []).sort((a, b) => catIdx(a) - catIdx(b) || (a.orden || 0) - (b.orden || 0));
       settings = (s && s[0]) || null;
       if (!settings) settings = (await SB.insert('settings', { id: 1, ...D.settings }))[0];
     });
@@ -95,19 +101,19 @@
   function renderList() {
     const ul = $('#plist');
     if (!products.length) { ul.innerHTML = '<li class="muted">Todavía no hay productos. Tocá «＋ Nuevo».</li>'; return; }
-    ul.innerHTML = products.map((p, i) => `
+    ul.innerHTML = products.map((p, i) => `${i === 0 || catIdx(products[i - 1]) !== catIdx(p) ? `<li class="pgroup">${esc(catName(p))}</li>` : ''}
       <li class="pitem${p.disponible ? '' : ' off'}" data-id="${esc(p.id)}">
-        <img src="${esc(imgSrc(p.img))}" alt="" loading="lazy">
+        <img src="${esc(imgSrc(p.img || (p.fotos || [])[0]))}" alt="" loading="lazy">
         <div class="pmain" data-edit role="button" tabindex="0" aria-label="Editar ${esc(p.nombre)}">
           <b>${esc(p.nombre)}</b>
           <span><span class="nw">½ kg ${money(p.precio_medio)}</span> · <span class="nw">1 kg ${money(p.precio_kilo)}</span></span>
-          <div class="chips">${p.a_pedido ? '<span class="chip">A pedido</span>' : ''}${p.en_mix ? '<span class="chip">Mix</span>' : ''}${p.disponible ? '' : '<span class="chip">Sin stock</span>'}</div>
+          <div class="chips">${p.a_pedido ? '<span class="chip">A pedido</span>' : ''}${p.en_mix ? '<span class="chip">Mix</span>' : ''}${(p.fotos || []).length ? `<span class="chip">${(p.fotos || []).length + (p.img ? 1 : 0)} fotos</span>` : ''}${p.disponible ? '' : '<span class="chip">Sin stock</span>'}</div>
         </div>
         <div class="pside">
           <label class="switch" title="Hay stock"><input type="checkbox" data-stock ${p.disponible ? 'checked' : ''} aria-label="Hay stock de ${esc(p.nombre)}"><span></span></label>
           <div class="order">
-            <button type="button" data-move="-1" ${i === 0 ? 'disabled' : ''} aria-label="Subir">▲</button>
-            <button type="button" data-move="1" ${i === products.length - 1 ? 'disabled' : ''} aria-label="Bajar">▼</button>
+            <button type="button" data-move="-1" ${i === 0 || catIdx(products[i - 1]) !== catIdx(p) ? 'disabled' : ''} aria-label="Subir">▲</button>
+            <button type="button" data-move="1" ${i === products.length - 1 || catIdx(products[i + 1]) !== catIdx(p) ? 'disabled' : ''} aria-label="Bajar">▼</button>
           </div>
         </div>
       </li>`).join('');
@@ -120,7 +126,7 @@
     const mv = e.target.closest('[data-move]');
     if (mv) {
       const i = products.indexOf(p), j = i + Number(mv.dataset.move);
-      if (j < 0 || j >= products.length) return;
+      if (j < 0 || j >= products.length || catIdx(products[j]) !== catIdx(p)) return;
       [products[i], products[j]] = [products[j], products[i]];
       const changes = [];
       products.forEach((x, k) => { if (x.orden !== k + 1) { x.orden = k + 1; changes.push(x); } });
@@ -142,12 +148,13 @@
   /* ---------- editor ---------- */
   const form = $('#productForm');
   function openEditor(p) {
-    editing = p || null; pendingPhoto = null;
+    editing = p || null;
     form.reset(); $('#productError').hidden = true;
     $('#sheetTitle').textContent = p ? 'Editar producto' : 'Nuevo producto';
     $('#deleteProduct').hidden = !p;
-    const v = p || { disponible: true, en_mix: false, a_pedido: false };
+    const v = p || { disponible: true, en_mix: false, a_pedido: false, categoria: 'especiales' };
     form.nombre.value = v.nombre || '';
+    form.categoria.value = CATS[catIdx(v)][0];
     form.descripcion.value = v.descripcion || '';
     form.precio_medio.value = v.precio_medio ?? '';
     form.precio_kilo.value = v.precio_kilo ?? '';
@@ -157,12 +164,30 @@
     form.disponible.checked = !!v.disponible;
     form.a_pedido.checked = !!v.a_pedido;
     form.en_mix.checked = !!v.en_mix;
-    $('#photoPreview').src = imgSrc(v.img);
+    photos = [v.img, ...(v.fotos || [])].filter(Boolean).map(src => ({ src }));
+    renderPhotos();
     $('#sheet').hidden = false; $('#sheetBg').hidden = false; document.body.style.overflow = 'hidden';
     $('#sheet').scrollTop = 0;
     setTimeout(() => form.nombre.focus(), 60);
   }
-  function closeEditor() { $('#sheet').hidden = true; $('#sheetBg').hidden = true; document.body.style.overflow = ''; editing = null; pendingPhoto = null; }
+  function closeEditor() {
+    $('#sheet').hidden = true; $('#sheetBg').hidden = true; document.body.style.overflow = ''; editing = null;
+    photos.forEach(ph => ph.preview && URL.revokeObjectURL(ph.preview)); photos = [];
+  }
+  function renderPhotos() {
+    const main = photos[0];
+    $('#photoPreview').src = main ? (main.preview || imgSrc(main.src)) : imgSrc('');
+    $('#extraPhotos').innerHTML = photos.slice(1).map((ph, k) => `<li>
+        <img src="${esc(ph.preview || imgSrc(ph.src))}" alt="Foto ${k + 2}">
+        <button type="button" class="t-main" data-main="${k + 1}" aria-label="Usar como foto principal">★</button>
+        <button type="button" class="t-del" data-del-photo="${k + 1}" aria-label="Quitar esta foto">✕</button>
+      </li>`).join('');
+  }
+  $('#extraPhotos').addEventListener('click', e => {
+    const m = e.target.closest('[data-main]'), d = e.target.closest('[data-del-photo]');
+    if (m) { const [ph] = photos.splice(+m.dataset.main, 1); photos.unshift(ph); renderPhotos(); toast('Ahora es la foto principal. Tocá «Guardar».'); }
+    if (d) { const [ph] = photos.splice(+d.dataset.delPhoto, 1); if (ph.preview) URL.revokeObjectURL(ph.preview); renderPhotos(); }
+  });
   $('#newProduct').addEventListener('click', () => openEditor(null));
   $('#closeSheet').addEventListener('click', closeEditor);
   $('#sheetBg').addEventListener('click', closeEditor);
@@ -183,11 +208,26 @@
     const f = e.target.files && e.target.files[0]; if (!f) return;
     if (!f.type.startsWith('image/')) return toast('Elegí una imagen.', true);
     try {
-      pendingPhoto = await shrink(f);
-      $('#photoPreview').src = URL.createObjectURL(pendingPhoto);
-      toast(`Foto lista (${Math.round(pendingPhoto.size / 1024)} KB). Tocá «Guardar».`);
+      const blob = await shrink(f);
+      const ph = { blob, preview: URL.createObjectURL(blob) };
+      if (photos.length) { if (photos[0].preview) URL.revokeObjectURL(photos[0].preview); photos[0] = ph; } else photos.push(ph);
+      renderPhotos();
+      toast(`Foto lista (${Math.round(blob.size / 1024)} KB). Tocá «Guardar».`);
     } catch (err) { toast(err.message, true); }
     e.target.value = '';
+  });
+  // fotos extra (se pueden elegir varias juntas)
+  $('#extraInput').addEventListener('change', async e => {
+    const files = [...(e.target.files || [])].filter(f => f.type.startsWith('image/'));
+    e.target.value = '';
+    if (!files.length) return;
+    busy(true);
+    try {
+      for (const f of files) { const blob = await shrink(f); photos.push({ blob, preview: URL.createObjectURL(blob) }); }
+      renderPhotos();
+      toast(files.length === 1 ? 'Foto lista. Tocá «Guardar».' : `${files.length} fotos listas. Tocá «Guardar».`);
+    } catch (err) { toast(err.message, true); }
+    finally { busy(false); }
   });
 
   form.addEventListener('submit', async e => {
@@ -198,6 +238,7 @@
     err.hidden = true;
     const row = {
       nombre,
+      categoria: form.categoria.value,
       descripcion: form.descripcion.value.trim(),
       precio_medio: price(form.precio_medio.value),
       precio_kilo: price(form.precio_kilo.value),
@@ -217,7 +258,13 @@
     }
     try {
       await guard(async () => {
-        if (pendingPhoto) row.img = await SB.upload(`productos/${id}-${Date.now()}.jpg`, pendingPhoto, 'image/jpeg');
+        for (let k = 0; k < photos.length; k++) {
+          const ph = photos[k]; if (!ph.blob) continue;
+          ph.src = await SB.upload(`productos/${id}-${Date.now()}-${k}.jpg`, ph.blob, 'image/jpeg');
+          delete ph.blob;
+        }
+        row.img = photos[0] ? photos[0].src : '';
+        row.fotos = photos.slice(1).map(ph => ph.src);
         if (editing) await SB.update('products', 'id=eq.' + encodeURIComponent(id), row);
         else await SB.insert('products', { img: '', ...row });
       }, 'Guardado ✓');

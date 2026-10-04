@@ -413,7 +413,12 @@
       if (reduce) { t.style.opacity = hide ? 0 : 1; return; }
       animate(t, hide ? { opacity: 0, y: 20, duration: 300, ease: 'inQuad' } : { opacity: [0, 1], y: [20, 0], duration: 500, ease: 'outBack(2)' });
     },
-    cardsReady: cardsIn
+    cardsReady: cardsIn,
+    // al cambiar de categoría: las tarjetas entran enseguida, sin esperar el scroll
+    cardsSwap() {
+      if (reduce) return;
+      animate($$('#productGrid .card, #productGrid .grid-group'), { y: [24, 0], opacity: [0, 1], duration: 650, delay: stagger(45), ease: 'outExpo' });
+    }
   };
   // si el carrito ya tenía cosas al cargar
   if ($('[data-cart-count]')?.textContent !== '0') window.SaborFX.fab(true);

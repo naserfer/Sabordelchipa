@@ -93,6 +93,16 @@ legend { float: left; width: 100%; padding: 0; font-family: 'Playfair Display', 
 .photo { display: grid; justify-items: center; gap: 8px; }
 .photo img { width: 100%; max-width: 420px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; background: var(--cream-2); }
 .photo-btn { cursor: pointer; }
+.extra { display: grid; gap: 8px; justify-items: start; }
+.thumbs { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.thumbs:empty { display: none; }
+.thumbs li { position: relative; width: 84px; height: 84px; }
+.thumbs img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; background: var(--cream-2); }
+.thumbs button { position: absolute; top: 4px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(255, 253, 248, .95); box-shadow: 0 1px 4px rgba(0,0,0,.3); cursor: pointer; font-size: 13px; line-height: 1; }
+.thumbs .t-main { left: 4px; color: var(--gold); }
+.thumbs .t-del { right: 4px; color: var(--danger); }
+.pgroup { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 18px; padding: 10px 4px 0; color: var(--ink-2); }
+.pgroup:first-child { padding-top: 0; }
 .sheet-actions { display: flex; justify-content: space-between; gap: 10px; position: sticky; bottom: 0; z-index: 2; padding: 12px 0 calc(14px + env(safe-area-inset-bottom)); background: var(--cream); box-shadow: 0 -10px 16px -12px rgba(43, 30, 22, .35); }
 .nw { white-space: nowrap; }
 .sheet-actions .btn-primary { flex: 1; }

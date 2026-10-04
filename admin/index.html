@@ -114,10 +114,23 @@
       <div class="photo">
         <img id="photoPreview" alt="" src="/img/logo-200.png">
         <label class="btn btn-ghost btn-sm photo-btn">📷 Cambiar foto<input type="file" id="photoInput" accept="image/*" hidden></label>
-        <small class="muted">Se achica sola antes de subir (máx. 1400 px).</small>
+        <small class="muted">Es la foto principal. Se achica sola antes de subir (máx. 1400 px).</small>
+      </div>
+      <div class="extra">
+        <div class="field-label">Más fotos (opcional)</div>
+        <ul class="thumbs" id="extraPhotos"></ul>
+        <label class="btn btn-ghost btn-sm photo-btn">＋ Agregar fotos<input type="file" id="extraInput" accept="image/*" multiple hidden></label>
+        <small class="muted">En la web se pasan deslizando con el dedo. ★ la pone como principal, ✕ la saca.</small>
       </div>
       <label>Nombre<input name="nombre" required maxlength="60"></label>
-      <label>Descripción<textarea name="descripcion" rows="3" maxlength="240"></textarea></label>
+      <label>Categoría
+        <select name="categoria">
+          <option value="clasicos">Clásicos</option>
+          <option value="formas">Formas especiales</option>
+          <option value="especiales">Especiales</option>
+        </select>
+      </label>
+      <label>Descripción<textarea name="descripcion" rows="4" maxlength="400"></textarea></label>
       <div class="two">
         <label>Precio ½ kg ($)<input name="precio_medio" inputmode="numeric" placeholder="12000"></label>
         <label>Precio 1 kg ($)<input name="precio_kilo" inputmode="numeric" placeholder="20000"></label>
