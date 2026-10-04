@@ -208,10 +208,10 @@ button { font: inherit; color: inherit; }
 /* ============ Historia ============ */
 .story { padding: 110px 0; }
 .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
-.story-media { position: relative; padding-bottom: 60px; }
+.story-media { position: relative; padding-bottom: 30%; }
 .story-media img { border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; height: auto; }
 .story-media img:first-child { aspect-ratio: 16 / 10; object-fit: cover; }
-.story-media-2 { position: absolute; right: -18px; bottom: -10px; width: 46% !important; aspect-ratio: 1; object-fit: cover; border: 6px solid var(--paper); transform: rotate(4deg); }
+.story-media-2 { position: absolute; right: -18px; bottom: 0; width: 34% !important; aspect-ratio: 1; object-fit: cover; border: 6px solid var(--paper); transform: rotate(4deg); }
 .story-copy p { color: var(--ink-2); font-size: 17px; }
 .chips { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .chips li { padding: 8px 14px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); font-size: 14px; font-weight: 500; }
