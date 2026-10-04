@@ -115,7 +115,7 @@
 
           <div class="hero-cta" data-intro>
             <a class="btn btn-primary" href="#variedades">Ver variedades</a>
-            <a class="btn btn-wa" data-wa-link href="#" target="_blank" rel="noopener">
+            <a class="btn btn-wa" data-wa-link data-magnet href="#" target="_blank" rel="noopener">
               <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
               Escribinos
             </a>
@@ -520,17 +520,55 @@
           <div class="road-line"></div>
           <div class="rider">
           <span class="puff p1"></span><span class="puff p2"></span><span class="puff p3"></span>
-          <svg class="moto" viewBox="0 0 160 110">
+          <svg class="moto" viewBox="0 0 180 124" aria-hidden="true">
+            <ellipse class="moto-shadow" cx="92" cy="118" rx="74" ry="4" fill="#2B1E16" opacity=".14"/>
             <g class="moto-body">
-              <rect x="70" y="18" width="46" height="40" rx="6" fill="#B98A2E"/>
-              <text x="93" y="44" text-anchor="middle" font-size="11" font-weight="700" fill="#FFF8EA" font-family="Montserrat, sans-serif">CHIPÁ</text>
-              <path d="M30 78 h70 l18-22 h-30 l-8 10 H44 Z" fill="#2B1E16"/>
-              <path d="M110 56 l14 -20 h8" stroke="#2B1E16" stroke-width="6" stroke-linecap="round" fill="none"/>
-              <circle cx="54" cy="44" r="10" fill="#2B1E16"/>
-              <path d="M50 54 l-6 22 h16 l10 -16" fill="#C8742B"/>
+              <!-- caja térmica -->
+              <path d="M14 66 H50" stroke="#5E4838" stroke-width="3" stroke-linecap="round"/>
+              <rect x="5" y="26" width="46" height="40" rx="6" fill="#B98A2E"/>
+              <rect x="5" y="26" width="46" height="9" rx="5" fill="#9C7322"/>
+              <rect x="5" y="31" width="46" height="4" fill="#9C7322"/>
+              <use href="#sol" x="19" y="37" width="18" height="18" style="color:#FCE7A8"/>
+              <text x="28" y="62" text-anchor="middle" font-size="8.5" font-weight="800" letter-spacing=".6" fill="#FFF8EA" font-family="Montserrat, sans-serif">CHIPÁ</text>
+              <!-- bufanda celeste y blanca -->
+              <g class="moto-scarf">
+                <path d="M81 31 C72 27 66 33 55 28 C59 36 68 37 80 35 Z" fill="#74ACDF"/>
+                <path d="M80 33 C72 31 67 35 59 32" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              </g>
+              <!-- escape -->
+              <rect x="6" y="101" width="26" height="5" rx="2.5" fill="#7A6656"/>
+              <!-- carrocería tipo Vespa, celeste -->
+              <path d="M12 92 C10 78 20 66 40 64 L84 64 C92 64 95 71 93 79 L89 92 L59.4 92 A21 21 0 0 0 20.6 92 Z" fill="#74ACDF"/>
+              <path d="M14 88 C18 80 26 74 38 72" stroke="#FFF8EA" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".85"/>
+              <path d="M86 86 H126 V93 H84 Z" fill="#4F8FCB"/>
+              <path d="M116 93 C122 80 125 62 127 46 L136 46 C136 62 134 80 130 93 Z" fill="#74ACDF"/>
+              <path d="M121 97 A21 21 0 0 1 163 97 L159 97 A17 17 0 0 0 125 97 Z" fill="#74ACDF"/>
+              <rect x="10" y="72" width="4" height="7" rx="1.5" fill="#C0392B"/>
+              <!-- asiento -->
+              <rect x="52" y="57" width="36" height="8" rx="4" fill="#2B1E16"/>
+              <!-- piloto: pierna -->
+              <path d="M70 59 L98 64" stroke="#4A3A30" stroke-width="12" stroke-linecap="round"/>
+              <path d="M98 64 L104 84" stroke="#4A3A30" stroke-width="10" stroke-linecap="round"/>
+              <ellipse cx="108" cy="87" rx="8" ry="3.8" fill="#2B1E16"/>
+              <!-- torso con campera -->
+              <path d="M65 63 C62 52 66 39 76 33 C83 29 92 31 93 38 C94 46 91 55 89 63 Z" fill="#C8742B"/>
+              <path d="M89 35 C91 42 90 52 87.5 61" stroke="#E89A55" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <!-- manubrio y faro -->
+              <path d="M129 42 L117 37" stroke="#2B1E16" stroke-width="4" stroke-linecap="round"/>
+              <rect x="124" y="39" width="18" height="10" rx="5" fill="#4F8FCB"/>
+              <circle cx="143" cy="44" r="4.2" fill="#FFF3C4" stroke="#FFF8EA" stroke-width="1.4"/>
+              <!-- brazo -->
+              <path d="M85 37 L103 46 L118 39" stroke="#C8742B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <circle cx="119" cy="38.5" r="3.6" fill="#E9B48A"/>
+              <!-- cabeza con casco -->
+              <rect x="84" y="25" width="7" height="7" rx="2" fill="#E9B48A"/>
+              <circle cx="88" cy="18" r="12" fill="#FFF8EA"/>
+              <path d="M78.9 12.8 A10.5 10.5 0 0 1 96 11.3" stroke="#74ACDF" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M77 22.5 C80.5 28.5 88 30.5 94 28" stroke="#E6D7BC" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M91 12.5 C97 12 101 16 100.5 22 C100.3 24.5 98 26 95 26 L91 26 C90 21 90 16 91 12.5 Z" fill="#2B1E16" opacity=".88"/>
+              <path d="M94 15 C96 15.5 97.5 17 98 19" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
             </g>
-            <g class="wheel w1"><circle cx="38" cy="86" r="16" fill="#2B1E16"/><circle cx="38" cy="86" r="6" fill="#F4EBDA"/><path d="M38 72 V100 M24 86 H52" stroke="#F4EBDA" stroke-width="2"/></g>
-            <g class="wheel w2"><circle cx="122" cy="86" r="16" fill="#2B1E16"/><circle cx="122" cy="86" r="6" fill="#F4EBDA"/><path d="M122 72 V100 M108 86 H136" stroke="#F4EBDA" stroke-width="2"/></g>
+            <g class="wheel w1"><circle cx="40" cy="100" r="17" fill="#2B1E16"/><circle cx="40" cy="100" r="14" fill="none" stroke="#4A3A30" stroke-width="1.2"/><circle cx="40" cy="100" r="10.5" fill="#F4EBDA"/><path d="M40 90.5 V109.5 M31 97 L49 103 M31 103 L49 97" stroke="#9A8676" stroke-width="1.6" stroke-linecap="round"/><circle cx="40" cy="100" r="3.6" fill="#2B1E16"/></g>
+            <g class="wheel w2"><circle cx="142" cy="100" r="17" fill="#2B1E16"/><circle cx="142" cy="100" r="14" fill="none" stroke="#4A3A30" stroke-width="1.2"/><circle cx="142" cy="100" r="10.5" fill="#F4EBDA"/><path d="M142 90.5 V109.5 M133 97 L151 103 M133 103 L151 97" stroke="#9A8676" stroke-width="1.6" stroke-linecap="round"/><circle cx="142" cy="100" r="3.6" fill="#2B1E16"/></g>
           </svg>
           </div>
         </div>
@@ -585,7 +623,7 @@
         <p>Que no te agarre la merienda sin nada rico. Pedí el tuyo y en 20 minutos está.</p>
         <div class="hero-cta">
           <button class="btn btn-primary" type="button" data-open-cart>Ver mi pedido</button>
-          <a class="btn btn-ghost-light" data-wa-link href="#" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
+          <a class="btn btn-ghost-light" data-wa-link data-magnet href="#" target="_blank" rel="noopener">Escribinos por WhatsApp</a>
         </div>
       </div>
     </section>

@@ -266,6 +266,84 @@
   }
 
   /* ---------------------------------------------------------
+     5a. "Escribinos": cuando le pasás el mouse, no te suelta por 4 segundos.
+         El botón sigue al cursor con una correa elástica (se estira, pero no se
+         va más lejos que LEASH), muestra un globito con cuenta regresiva y
+         suelta con un rebote. Solo con mouse y sin movimiento reducido.
+     --------------------------------------------------------- */
+  if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const HOLD = 4000, LEASH = 190, COOLDOWN = 2500;
+    const LINES = ['¡Ey, no te vayas! 🧉', 'Escribinos, dale 😄'];
+    $$('[data-magnet]').forEach(btn => {
+      const bubble = document.createElement('span');
+      bubble.className = 'magnet-bubble'; bubble.setAttribute('aria-hidden', 'true');
+      bubble.innerHTML = '<span class="mb-text"></span><i class="mb-bar"></i>';
+      btn.appendChild(bubble);
+      const text = $('.mb-text', bubble), bar = $('.mb-bar', bubble), icon = $('svg', btn);
+      let held = false, busy = false, t0 = 0, mx = 0, my = 0, raf = 0, timers = [], cooldownUntil = 0;
+
+      // centro del botón "en reposo" (offsetLeft/Top no incluyen la traslación que le damos)
+      const home = () => {
+        const op = btn.offsetParent || document.body, r = op.getBoundingClientRect();
+        return { x: r.left + btn.offsetLeft + btn.offsetWidth / 2, y: r.top + btn.offsetTop + btn.offsetHeight / 2 };
+      };
+      function follow() {
+        raf = 0; if (!held) return;
+        const h = home(); let dx = mx - h.x, dy = my - h.y;
+        const d = Math.hypot(dx, dy) || 1, k = LEASH * (1 - Math.exp(-d / LEASH)) / d;
+        dx *= k; dy *= k;
+        animate(btn, { x: dx, y: dy, rotate: clamp(dx / 16, -1, 1) * 8, scale: 1.06, duration: 420, ease: 'outQuad' });
+      }
+      const queue = () => { if (!raf) raf = requestAnimationFrame(follow); };
+      const onMove = e => { mx = e.clientX; my = e.clientY; queue(); };
+      function heart() {
+        const r = btn.getBoundingClientRect(), h = document.createElement('span');
+        h.className = 'magnet-heart'; h.textContent = Math.random() < .7 ? '💚' : '🧀';
+        const side = Math.random() < .5 ? -1 : 1; // salen por los costados, así no tapan el globito
+        h.style.left = (r.left + r.width / 2 + side * r.width * .46) + 'px'; h.style.top = (r.top + r.height * .3) + 'px';
+        document.body.appendChild(h);
+        animate(h, { y: -50 - Math.random() * 30, x: side * utils.random(14, 40), opacity: [1, 0], scale: [.5, 1.15], rotate: side * utils.random(5, 30),
+          duration: 1300, ease: 'outQuad', onComplete: () => h.remove() });
+      }
+      function grab(e) {
+        if (held || busy || performance.now() < cooldownUntil) return;
+        held = true; t0 = performance.now(); mx = e.clientX; my = e.clientY;
+        btn.classList.add('is-held');
+        document.addEventListener('pointermove', onMove, { passive: true });
+        addEventListener('scroll', queue, { passive: true });
+        animate(btn, { scale: [{ to: 1.16, duration: 150, ease: 'outQuad' }, { to: 1.06, duration: 600, ease: 'outElastic(1, .45)' }] });
+        if (icon) animate(icon, { rotate: [0, -18, 16, -10, 6, 0], duration: 800, ease: 'inOutSine' });
+        let i = 0; text.textContent = LINES[0]; bubble.classList.add('show');
+        bar.style.transition = 'none'; bar.style.transform = 'scaleX(1)'; void bar.offsetWidth;
+        bar.style.transition = `transform ${HOLD}ms linear`; bar.style.transform = 'scaleX(0)';
+        timers = [
+          setInterval(() => { text.textContent = LINES[++i % LINES.length]; }, HOLD / LINES.length),
+          setInterval(heart, 850),
+          setTimeout(() => release('Bueno… te suelto 🥲'), HOLD)
+        ];
+        heart();
+        queue();
+      }
+      function release(msg) {
+        if (!held) return;
+        held = false; busy = true;
+        timers.forEach(t => { clearInterval(t); clearTimeout(t); });
+        document.removeEventListener('pointermove', onMove);
+        removeEventListener('scroll', queue);
+        text.textContent = msg; bar.style.transition = 'none'; bar.style.transform = 'scaleX(0)';
+        animate(btn, { x: 0, y: 0, rotate: 0, scale: 1, duration: 1500, ease: 'outElastic(1, .35)' });
+        setTimeout(() => bubble.classList.remove('show'), 1300);
+        setTimeout(() => {
+          btn.classList.remove('is-held'); btn.style.transform = '';
+          busy = false; cooldownUntil = performance.now() + COOLDOWN;
+        }, 1550);
+      }
+      btn.addEventListener('pointerenter', grab);
+      btn.addEventListener('click', () => { if (held) setTimeout(() => release('¡Gracias! Te esperamos 💚'), 150); });
+    });
+  }
+
+  /* ---------------------------------------------------------
      5b. Mate y chipá: el termo ceba, sube la espuma y el vapor
      --------------------------------------------------------- */
   onceVisible($('#mateSvg'), () => {
@@ -358,6 +436,7 @@
     run();
     animate('.moto-body', { y: [0, -3], duration: 220, alternate: true, loop: true, ease: 'inOutSine' });
     animate('.wheel', { rotate: '1turn', duration: 500, loop: true, ease: 'linear' });
+    animate('.moto-scarf', { rotate: [-5, 7], scaleX: [1, 1.08], duration: 260, alternate: true, loop: true, ease: 'inOutSine' });
     animate('.puff', { opacity: [{ to: .9, duration: 120 }, { to: 0, duration: 680 }], scale: [.4, 2.2], x: [0, -46], y: [0, -16], duration: 800, loop: true, delay: stagger(260), ease: 'outQuad' });
     animate('.cloud', { x: [0, 30], duration: 6000, alternate: true, loop: true, ease: 'inOutSine', delay: stagger(1200) });
     const flagA = {
