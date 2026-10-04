@@ -311,16 +311,27 @@
   }
   cardsIn();
 
-  // tilt suave en las tarjetas (solo con mouse)
+  // tilt suave en las tarjetas (solo con mouse).
+  // Sobre los controles (variedad, ½ kg / 1 kg, botón) la tarjeta queda derecha: si está
+  // inclinada en 3D cuando se abre un <select>, Chrome dibuja la lista desplegable corrida.
   if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const level = (c, ms) => { c._flat = true; animate(c, { rotateX: 0, rotateY: 0, duration: ms, ease: 'outQuad' }); };
+    const picking = c => { const a = document.activeElement; return !!a && a.tagName === 'SELECT' && c.contains(a); };
+    document.addEventListener('pointerdown', e => {
+      const c = e.target.closest?.('.card');
+      if (c && e.target.closest('select')) { level(c, 0); c.style.transform = 'none'; }
+    }, true);
     document.addEventListener('pointermove', e => {
       const c = e.target.closest?.('.card'); if (!c) return;
+      if (e.target.closest('.card-foot') || picking(c)) { if (!c._flat) level(c, 160); return; }
+      c._flat = false;
       const r = c.getBoundingClientRect();
       const rx = ((e.clientY - r.top) / r.height - .5) * -6, ry = ((e.clientX - r.left) / r.width - .5) * 6;
       animate(c, { rotateX: rx, rotateY: ry, duration: 400, ease: 'outQuad' });
     });
     document.addEventListener('pointerout', e => {
-      const c = e.target.closest?.('.card'); if (c && !c.contains(e.relatedTarget)) animate(c, { rotateX: 0, rotateY: 0, duration: 700, ease: 'outElastic(1, .5)' });
+      const c = e.target.closest?.('.card');
+      if (c && !c.contains(e.relatedTarget) && !c._flat && !picking(c)) animate(c, { rotateX: 0, rotateY: 0, duration: 700, ease: 'outElastic(1, .5)' });
     });
   }
 
