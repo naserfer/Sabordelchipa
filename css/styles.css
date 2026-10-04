@@ -329,13 +329,13 @@ button { font: inherit; color: inherit; }
 /* ============ Videos ============ */
 .reels-sec { padding: 110px 0 90px; background: linear-gradient(var(--cream-2), var(--cream)); overflow: hidden; }
 .reels {
-  --gut: max(16px, calc((100vw - var(--wrap)) / 2));
-  display: grid; grid-auto-flow: column; grid-auto-columns: min(68vw, 260px); gap: 18px; justify-content: start;
+  --gut: 16px;
+  display: grid; grid-auto-flow: column; grid-auto-columns: min(68vw, 230px); gap: 18px;
+  width: max-content; max-width: 100%; margin-inline: auto; /* centrado si entran todos; si no, se desliza */
   overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
   padding: 4px var(--gut) 18px; scroll-padding-inline: var(--gut);
 }
 .reels::-webkit-scrollbar { display: none; }
-@media (min-width: 1160px) { .reels { justify-content: center; } }
 .reel { margin: 0; scroll-snap-align: start; display: flex; flex-direction: column; gap: 10px; }
 .reel-media { position: relative; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: var(--ink); box-shadow: var(--shadow); cursor: pointer; }
 .reel-media video { width: 100%; height: 100%; object-fit: cover; display: block; }

@@ -151,6 +151,22 @@
       $$('.card-dots i', t.parentElement).forEach((d, k) => d.classList.toggle('on', k === i));
     });
   }, true);
+  // si una foto no carga (por ejemplo, la borraron del bucket), no queda el ícono de imagen rota
+  $('#productGrid').addEventListener('error', e => {
+    const img = e.target; if (img.tagName !== 'IMG') return;
+    const media = img.closest('.card-media'); if (!media) return;
+    const track = img.closest('.card-track');
+    if (track && track.children.length > 1) {
+      $$('.card-dots i', media)[[...track.children].indexOf(img)]?.remove();
+      img.remove();
+      if (track.children.length === 1) $$('.g-nav, .card-dots', media).forEach(x => x.remove());
+      return;
+    }
+    const nombre = $('.card-body .h3', media.closest('.card'))?.textContent || '';
+    (track || img).remove();
+    media.classList.add('card-media-ph');
+    media.insertAdjacentHTML('afterbegin', `<svg class="ph-sol" aria-hidden="true"><use href="#sol"/></svg><span class="ph-name">${esc(nombre)}</span><small>Foto próximamente</small>`);
+  }, true);
   function slide(track, dir) {
     const n = track.children.length, w = track.clientWidth;
     const i = Math.round(track.scrollLeft / Math.max(1, w));

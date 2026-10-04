@@ -35,7 +35,8 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
   - Datos del negocio y cambio de contraseña.
 - `supabase/setup.sql`: esquema completo y políticas. Es la fuente de verdad de la base.
 - `img/`: fotos del producto en webp + jpg (las nuevas, recortadas a 4:3 de 900×675).
-- `video/`: reels verticales 540×960 sin audio: `.mp4` (H.264, va primero), `.webm` (VP9, respaldo) y `.webp` (poster).
+- `video/`: reels verticales 540×960 sin audio: `.mp4` (H.264, va primero), `.webm` (VP9, respaldo) y `.webp` (poster). Los videos de WhatsApp vienen a veces en HEVC: siempre recodificarlos a H.264.
+- Si una foto de producto no carga, la tarjeta muestra "Foto próximamente" en vez del ícono roto.
 
 ## Base de datos (Supabase)
 
@@ -78,7 +79,6 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
 ## Pendientes
 
 - Los precios, unidades y sabores salen de la carta de octubre 2026 (migración `20261004_carta_octubre.sql`).
-- Falta una foto de las Pizzetas de chipá (hoy la tarjeta muestra "Foto próximamente"). Se sube desde /admin.
 - Confirmar con el dueño: en el bohío de calabaza la carta dice "queso por salud"; en la web quedó "Port Salut".
 - Cuando haya dominio final: poner la URL absoluta en `og:image` de `index.html`.
 - Mantener activa la base (plan gratis): configurar un ping cada 2 días con cron-job.org a `/rest/v1/settings?select=id` con header `apikey`.
