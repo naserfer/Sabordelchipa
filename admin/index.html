@@ -40,25 +40,132 @@
   <div class="app" id="viewApp" hidden>
     <header class="topbar">
       <div class="tb-brand"><img src="/img/logo-200.png" alt="" width="36" height="36"><span>Panel</span></div>
-      <nav class="tabs" role="tablist">
-        <button role="tab" class="tab is-active" data-tab="productos" aria-selected="true">Productos</button>
-        <button role="tab" class="tab" data-tab="negocio" aria-selected="false">Negocio</button>
-        <button role="tab" class="tab" data-tab="cuenta" aria-selected="false">Cuenta</button>
-      </nav>
+      <button class="icon-btn tb-refresh" type="button" id="refreshAll" aria-label="Actualizar datos" title="Actualizar datos">↻</button>
       <a class="btn btn-ghost btn-sm tb-web" href="/" target="_blank" rel="noopener">Ver la web ↗</a>
     </header>
 
-    <!-- Productos -->
-    <section class="panel" id="tab-productos">
+    <nav class="tabs" role="tablist" aria-label="Secciones del panel">
+      <button role="tab" class="tab is-active" data-tab="inicio" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></button>
+      <button role="tab" class="tab" data-tab="pedidos" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3"/></svg><span>Pedidos</span><b class="tab-badge" id="badgePedidos" hidden></b></button>
+      <button role="tab" class="tab" data-tab="clientes" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.4 3.5 5.2"/></svg><span>Clientes</span></button>
+      <button role="tab" class="tab" data-tab="productos" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5zM3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg><span>Productos</span><b class="tab-badge tab-badge-warn" id="badgeStock" hidden></b></button>
+      <button role="tab" class="tab" data-tab="visitas" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg><span>Visitas</span></button>
+      <button role="tab" class="tab" data-tab="ajustes" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span>Ajustes</span></button>
+    </nav>
+
+    <main class="main">
+    <!-- Inicio -->
+    <section class="panel panel-wide" id="tab-inicio">
       <div class="panel-head">
-        <div><h2>Productos</h2><p class="muted small">Tocá un producto para editarlo. El interruptor marca si hay stock.</p></div>
-        <button class="btn btn-primary" type="button" id="newProduct">＋ Nuevo</button>
+        <div><h2 id="hola">¡Hola!</h2><p class="muted small" id="hoyFecha"></p></div>
+        <button class="btn btn-primary" type="button" data-new-order>＋ Pedido</button>
       </div>
-      <ul class="plist" id="plist"></ul>
+      <div class="kpis" id="kpis"></div>
+      <div class="dash">
+        <article class="card" id="cardTareas"><h3>Para hacer</h3><div id="tareas"></div></article>
+        <article class="card" id="cardStock"><h3>Stock</h3><div id="dashStock"></div></article>
+        <article class="card card-span"><div class="card-head"><h3>Ventas de los últimos 30 días</h3><span class="muted small" id="ventas30Total"></span></div>
+          <p class="muted small card-sub">Pedidos confirmados y entregados, por día.</p>
+          <div class="chart" id="chartVentas"></div></article>
+        <article class="card"><div class="card-head"><h3>Lo más vendido</h3><span class="muted small">30 días</span></div><div id="topProductos"></div></article>
+        <article class="card"><div class="card-head"><h3>Personas en la web</h3><a class="small" href="#visitas">Ver más →</a></div>
+          <p class="muted small card-sub">Últimos 14 días.</p><div class="chart" id="chartVisitasMini"></div></article>
+        <article class="card card-span"><div class="card-head"><h3>Clientes</h3><a class="small" href="#clientes">Ver todos →</a></div><div id="dashClientes"></div></article>
+      </div>
     </section>
 
-    <!-- Negocio -->
-    <section class="panel" id="tab-negocio" hidden>
+    <!-- Pedidos -->
+    <section class="panel panel-wide" id="tab-pedidos" hidden>
+      <div class="panel-head">
+        <div><h2>Pedidos</h2><p class="muted small">Los de la web entran solos cuando el cliente toca «Enviar pedido por WhatsApp».</p></div>
+        <div class="head-actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="csvPedidos">⬇ CSV</button>
+          <button class="btn btn-primary" type="button" data-new-order>＋ Nuevo</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="qPedidos" placeholder="Buscar por cliente, código o producto" aria-label="Buscar pedidos">
+        <div class="chips" id="fPedidos" role="group" aria-label="Filtrar por estado"></div>
+      </div>
+      <ul class="olist" id="olist"></ul>
+      <button class="btn btn-ghost btn-block" type="button" id="morePedidos" hidden>Ver más pedidos</button>
+    </section>
+
+    <!-- Clientes -->
+    <section class="panel panel-wide" id="tab-clientes" hidden>
+      <div class="panel-head">
+        <div><h2>Clientes</h2><p class="muted small" id="clientesResumen">Se crean solos con cada pedido de la web. También los podés cargar a mano.</p></div>
+        <div class="head-actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="csvClientes">⬇ CSV</button>
+          <button class="btn btn-primary" type="button" id="newCliente">＋ Nuevo</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="qClientes" placeholder="Buscar por nombre, teléfono, barrio o etiqueta" aria-label="Buscar clientes">
+        <div class="toolbar-row">
+          <div class="chips" id="fClientes" role="group" aria-label="Filtrar clientes"></div>
+          <label class="sort">Ordenar
+            <select id="sClientes">
+              <option value="ultimo">Último pedido</option>
+              <option value="gastado">Más gastado</option>
+              <option value="pedidos">Más pedidos</option>
+              <option value="nuevos">Más nuevos</option>
+              <option value="nombre">Nombre (A-Z)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <ul class="clist" id="clist"></ul>
+      <button class="btn btn-ghost btn-block" type="button" id="moreClientes" hidden>Ver más clientes</button>
+    </section>
+
+    <!-- Productos -->
+    <section class="panel" id="tab-productos" hidden>
+      <div class="panel-head">
+        <div><h2>Productos</h2><p class="muted small">Tocá un producto para editarlo. El interruptor marca si hay stock; «Stock» carga los kilos.</p></div>
+        <button class="btn btn-primary" type="button" id="newProduct">＋ Nuevo</button>
+      </div>
+      <div id="stockResumen"></div>
+      <ul class="plist" id="plist"></ul>
+      <details class="movs" id="movsBox">
+        <summary>Últimos movimientos de stock</summary>
+        <ul class="mlist" id="movsAll"></ul>
+      </details>
+    </section>
+
+    <!-- Visitas -->
+    <section class="panel panel-wide" id="tab-visitas" hidden>
+      <div class="panel-head">
+        <div><h2>Visitas a la web</h2><p class="muted small">Personas que entraron a la web. Es anónimo: no se guarda quién es. Tus visitas desde este dispositivo no se cuentan.</p></div>
+      </div>
+      <div class="chips chips-range" id="rangoVisitas" role="group" aria-label="Período">
+        <button type="button" data-r="0" aria-pressed="false">Hoy</button>
+        <button type="button" data-r="7" aria-pressed="true">7 días</button>
+        <button type="button" data-r="30" aria-pressed="false">30 días</button>
+        <button type="button" data-r="90" aria-pressed="false">90 días</button>
+      </div>
+      <div class="vis-body" id="visBody">
+        <div class="kpis" id="visKpis"></div>
+        <div class="dash">
+          <article class="card card-span"><div class="card-head"><h3 id="visSerieTitulo">Personas por día</h3></div>
+            <div class="chart" id="chartVisitas"></div>
+            <details class="chart-table"><summary>Ver en tabla</summary><div id="tablaVisitas"></div></details></article>
+          <article class="card"><h3>Del vistazo al pedido</h3><p class="muted small card-sub">Cuántas visitas llegaron a cada paso.</p><div id="embudo"></div></article>
+          <article class="card"><h3>De dónde vienen</h3><p class="muted small card-sub">Instagram, Google, links directos…</p><div id="fuentes"></div></article>
+          <article class="card"><h3>Con qué entran</h3><div id="dispositivos"></div></article>
+          <article class="card"><h3>A qué hora entran</h3><p class="muted small card-sub">Sirve para saber cuándo publicar.</p><div class="chart" id="chartHoras"></div></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ajustes: negocio -->
+    <section class="panel" id="tab-negocio" data-group="ajustes" hidden>
       <div class="panel-head"><div><h2>Datos del negocio</h2><p class="muted small">Se actualizan en la web apenas guardás.</p></div></div>
       <form class="form" id="settingsForm" novalidate>
         <fieldset>
@@ -88,8 +195,8 @@
       </form>
     </section>
 
-    <!-- Cuenta -->
-    <section class="panel" id="tab-cuenta" hidden>
+    <!-- Ajustes: cuenta -->
+    <section class="panel" id="tab-cuenta" data-group="ajustes" hidden>
       <div class="panel-head"><div><h2>Cuenta</h2><p class="muted small" id="accountEmail"></p></div></div>
       <form class="form" id="pwForm" novalidate>
         <fieldset>
@@ -101,6 +208,7 @@
       </form>
       <button class="btn btn-ghost" type="button" id="logout">Cerrar sesión</button>
     </section>
+    </main>
   </div>
 
   <!-- ========== EDITOR DE PRODUCTO ========== -->
@@ -151,6 +259,158 @@
     </form>
   </aside>
 
+  <!-- ========== HOJAS DEL CRM (pedido, cliente, stock) ========== -->
+  <div class="sheet-bg" id="sheetBg2" hidden></div>
+
+  <aside class="sheet sheet-lg" id="orderSheet" aria-label="Pedido" hidden>
+    <form class="form" id="orderEdit" novalidate>
+      <div class="sheet-head">
+        <div><h2 id="oTitle">Pedido</h2><p class="muted small" id="oMeta"></p></div>
+        <button class="icon-btn" type="button" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div class="seg-estado" role="radiogroup" aria-label="Estado del pedido">
+        <label><input type="radio" name="estado" value="nuevo"><span>Nuevo</span></label>
+        <label><input type="radio" name="estado" value="confirmado"><span>Confirmado</span></label>
+        <label><input type="radio" name="estado" value="entregado"><span>Entregado</span></label>
+        <label><input type="radio" name="estado" value="cancelado"><span>Cancelado</span></label>
+      </div>
+      <p class="note" id="oStockNote" hidden></p>
+
+      <fieldset>
+        <legend>Cliente</legend>
+        <div class="linked" id="oLinked" hidden></div>
+        <div class="ac">
+          <label>Nombre<input name="cliente_nombre" maxlength="80" autocomplete="off" required aria-autocomplete="list" aria-controls="oSuggest"></label>
+          <ul class="suggest" id="oSuggest" hidden></ul>
+        </div>
+        <div class="two">
+          <label>WhatsApp<input name="cliente_tel" inputmode="tel" placeholder="11 2345 6789" autocomplete="off"></label>
+          <label>Barrio o dirección<input name="direccion" maxlength="200" autocomplete="off"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Productos</legend>
+        <div class="irows" id="oItems"></div>
+        <button class="btn btn-ghost btn-sm" type="button" id="oAddItem">＋ Agregar producto</button>
+        <div class="totals">
+          <div><span>Productos</span><b id="oSubtotal">$0</b></div>
+          <label class="inline">Envío ($)<input name="envio" inputmode="numeric" placeholder="0"></label>
+          <label class="inline total-in">Total ($)<input name="total" inputmode="numeric"></label>
+          <small class="muted" id="oTotalHint"></small>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Entrega y pago</legend>
+        <div class="two">
+          <label>Cuándo<input name="entrega" list="oEntregas" maxlength="120" placeholder="Lunes por la tarde"></label>
+          <label>Fecha<input name="fecha_entrega" type="date"></label>
+        </div>
+        <datalist id="oEntregas"></datalist>
+        <div class="two">
+          <label>Pago
+            <select name="pago">
+              <option>Transferencia</option><option>Efectivo</option><option>Mercado Pago</option><option>Otro</option>
+            </select></label>
+          <label class="check check-tall"><input type="checkbox" name="pagado"> Ya está cobrado</label>
+        </div>
+        <label>Notas<textarea name="notas" rows="2" maxlength="1000"></textarea></label>
+      </fieldset>
+
+      <p class="error" id="oError" role="alert" hidden></p>
+      <div class="sheet-actions">
+        <button class="btn btn-danger" type="button" id="oDelete">Eliminar</button>
+        <a class="btn btn-ghost" id="oWa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+        <button class="btn btn-primary" type="submit">Guardar</button>
+      </div>
+    </form>
+  </aside>
+
+  <aside class="sheet sheet-lg" id="clientSheet" aria-label="Cliente" hidden>
+    <form class="form" id="clientEdit" novalidate>
+      <div class="sheet-head">
+        <div><h2 id="cTitle">Cliente</h2><p class="muted small" id="cMeta"></p></div>
+        <button class="icon-btn" type="button" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div class="mini-kpis" id="cStats"></div>
+      <div id="cFav"></div>
+      <fieldset>
+        <legend>Datos</legend>
+        <label>Nombre<input name="nombre" maxlength="80" required></label>
+        <div class="two">
+          <label>WhatsApp<input name="telefono" inputmode="tel" placeholder="11 2345 6789"></label>
+          <label>Mail<input name="email" type="email" maxlength="120"></label>
+        </div>
+        <label>Barrio o dirección<input name="direccion" maxlength="200"></label>
+        <div class="two">
+          <label>Cumpleaños<input name="cumple" type="date"></label>
+          <label>Cómo nos conoció
+            <select name="origen">
+              <option value="web">Web</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option>
+              <option value="recomendacion">Recomendación</option><option value="manual">Otro</option>
+            </select></label>
+        </div>
+        <label>Etiquetas (separadas por coma)<input name="etiquetas" placeholder="Mayorista, Vecino, Café"></label>
+        <label>Notas<textarea name="notas" rows="3" maxlength="2000" placeholder="Le gusta sin sal, pide para el cumple, etc."></textarea></label>
+      </fieldset>
+      <section class="hist" id="cHistBox">
+        <div class="card-head"><h3>Pedidos</h3><button class="btn btn-ghost btn-sm" type="button" id="cNewOrder">＋ Pedido</button></div>
+        <ul class="hlist" id="cHist"></ul>
+      </section>
+      <details class="merge" id="cMergeBox">
+        <summary>¿Está repetido? Unirlo con otro cliente</summary>
+        <p class="muted small">Los pedidos de este cliente pasan al que elijas y este se borra. Los datos que falten se completan.</p>
+        <input type="search" id="cMergeQ" placeholder="Buscar el otro cliente" aria-label="Buscar el otro cliente">
+        <ul class="suggest suggest-static" id="cMergeList"></ul>
+      </details>
+      <p class="error" id="cError" role="alert" hidden></p>
+      <div class="sheet-actions">
+        <button class="btn btn-danger" type="button" id="cDelete">Eliminar</button>
+        <a class="btn btn-ghost" id="cWa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+        <button class="btn btn-primary" type="submit">Guardar</button>
+      </div>
+    </form>
+  </aside>
+
+  <aside class="sheet" id="stockSheet" aria-label="Stock" hidden>
+    <form class="form" id="stockEdit" novalidate>
+      <div class="sheet-head">
+        <div><h2 id="sTitle">Stock</h2><p class="muted small" id="sSub"></p></div>
+        <button class="icon-btn" type="button" data-close aria-label="Cerrar">✕</button>
+      </div>
+      <div class="stock-now" id="sNow"></div>
+      <fieldset id="sMoveBox">
+        <legend id="sMoveLegend">Cargar movimiento</legend>
+        <div class="seg-estado seg-3" role="radiogroup" aria-label="Tipo de movimiento" id="sTipos">
+          <label><input type="radio" name="tipo" value="produccion" checked><span>Entra<small>producción</small></span></label>
+          <label><input type="radio" name="tipo" value="merma"><span>Sale<small>merma o regalo</small></span></label>
+          <label><input type="radio" name="tipo" value="ajuste"><span>Corregir<small>conté y hay…</small></span></label>
+        </div>
+        <label><span id="sQtyLabel">Kilos que entran</span><input name="kg" inputmode="decimal" placeholder="Ej.: 2,5" autocomplete="off"></label>
+        <div class="quick" id="sQuick">
+          <button type="button" data-q="0.5">½ kg</button><button type="button" data-q="1">1 kg</button>
+          <button type="button" data-q="2">2 kg</button><button type="button" data-q="5">5 kg</button><button type="button" data-q="10">10 kg</button>
+        </div>
+        <label>Nota (opcional)<input name="nota" maxlength="200" placeholder="Ej.: tanda del martes"></label>
+        <button class="btn btn-primary btn-block" type="submit" id="sSave">Guardar</button>
+      </fieldset>
+      <fieldset id="sConfBox">
+        <legend>Aviso</legend>
+        <label>Avisarme cuando queden menos de (kg)<input name="minimo" inputmode="decimal" placeholder="1"></label>
+        <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="sSaveMin">Guardar aviso</button>
+          <button class="btn btn-danger btn-sm" type="button" id="sStop">Dejar de controlar</button>
+        </div>
+      </fieldset>
+      <section class="hist">
+        <h3>Movimientos</h3>
+        <ul class="mlist" id="sHist"></ul>
+      </section>
+    </form>
+  </aside>
+
+  <div class="chart-tip" id="chartTip" role="tooltip" hidden></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="busy" id="busy" hidden><span></span></div>
 
@@ -158,5 +418,9 @@
   <script src="/js/data.js"></script>
   <script src="/js/sb.js"></script>
   <script src="/admin/admin.js"></script>
+  <script src="/admin/charts.js"></script>
+  <script src="/admin/stock.js"></script>
+  <script src="/admin/crm.js"></script>
+  <script src="/admin/visitas.js"></script>
 </body>
 </html>

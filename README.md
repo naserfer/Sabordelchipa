@@ -81,6 +81,18 @@ En el plan gratis, Supabase pausa el proyecto si pasa unos 7 días sin actividad
 - **Negocio**: WhatsApp, Instagram, zona, días de entrega, opciones del formulario, fecha de precios y el **cartel de aviso** (aparece arriba de la web; si lo dejás vacío, no se muestra).
 - **Cuenta**: cambiar la contraseña y cerrar sesión.
 
+### CRM (pedidos, clientes, stock y visitas)
+
+- **Inicio**: lo que hay que hacer hoy (pedidos para confirmar, para entregar y para cobrar, cumpleaños de clientes), ventas de los últimos 30 días, lo más vendido, stock bajo y cuánta gente entró a la web.
+- **Pedidos**: los de la web entran solos cuando el cliente toca «Enviar pedido por WhatsApp». Los que llegan por Instagram o teléfono se cargan con **＋ Nuevo**. Cada pedido pasa por *Nuevo → Confirmado → Entregado* (o *Cancelado*) y se marca si ya está cobrado. Desde el pedido hay un botón para escribirle al cliente por WhatsApp con el mensaje armado.
+- **Clientes**: se crean solos con cada pedido. Muestra cuánto gastó cada uno, cuántos pedidos hizo, qué pide más y cuándo fue su último pedido. Filtros: nuevos, frecuentes, para reactivar (más de 45 días sin pedir) y cumpleaños del mes. Si un cliente quedó repetido, se une con otro desde su ficha.
+- **Stock** (en Productos, botón «Stock»): se carga en kilos. Al marcar un pedido como *Entregado* se descuenta solo; si llega a 0, la web muestra «Sin stock», y cuando cargás más vuelve a aparecer.
+- **Visitas**: cuántas personas entraron (hoy, 7, 30 o 90 días), cuántas sumaron algo al carrito y cuántas mandaron el pedido, de dónde vienen (Instagram, Google…), con qué dispositivo y a qué hora. Es anónimo y no cuenta tus visitas desde el navegador donde usás el panel.
+- **⬇ CSV** en Pedidos y Clientes baja una planilla que se abre con Excel o Google Sheets.
+- Tip: en el link de la bio de Instagram poné `?utm_source=instagram` al final de la dirección para que esas visitas salgan como «Instagram».
+
+**Instalar el CRM en una base que ya existía:** Supabase → **SQL Editor → New query**, pegá todo `supabase/migrations/20261004_crm.sql` y tocá **Run** (si avisa «destructive operation», tocá **Run this query**: no borra datos). Se puede correr más de una vez.
+
 ## Otros detalles
 
 - **Dominio propio**: `sabordelchipa.com.ar` cuesta AR$ 8.500 por año en NIC Argentina y se conecta en Cloudflare Pages → **Custom domains**.

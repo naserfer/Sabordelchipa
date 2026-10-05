@@ -276,6 +276,7 @@
     const found = cart.find(c => keyOf(c) === k);
     if (found) found.qty++; else cart.push({ ...it, qty: 1 });
     save(); renderCart(true);
+    window.SaborTrack?.evento('carrito');
   }
 
   function renderCart(bump) {
@@ -379,7 +380,21 @@
       '¡Gracias!'
     ].join('\n');
     window.open(waBase() + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    guardarPedido({ codigo: pedidoN, nombre, direccion: dir, telefono: String(f.get('telefono') || ''), entrega: f.get('entrega'), pago: f.get('pago'), notas });
   });
+
+  // El pedido también queda guardado en el panel (/admin → Pedidos) con su cliente.
+  // No frena el envío por WhatsApp: si la base no responde, el pedido igual sale.
+  function guardarPedido(datos) {
+    window.SaborTrack?.evento('pedido');
+    if (!window.SB || !SB.configured) return;
+    const idDe = nombre => (P.find(p => p.nombre === nombre) || {}).id;
+    const items = cart.map(c => c.id === 'mix'
+      ? { product_id: 'mix', size: 'medio', qty: c.qty, opt: c.opt, mix: c.opt.split(' + ').map(idDe).filter(Boolean) }
+      : { product_id: c.id, size: c.size, qty: c.qty, opt: c.opt });
+    const p = { ...datos, items, visitante: window.SaborTrack ? SaborTrack.visitante() : '' };
+    SB.rpc('crear_pedido_web', { p }, { keepalive: true }).catch(err => console.warn('No se pudo guardar el pedido en el panel:', err.message));
+  }
 
   // ---------- toast ----------
   let tt;

@@ -44,6 +44,48 @@
   }
   function showLoginError(m) { const e = $('#loginError'); e.textContent = m; e.hidden = !m; }
 
+  /* ---------- API compartida con los módulos del CRM (crm.js, stock.js, visitas.js) ---------- */
+  const listeners = {};
+  const fired = {};
+  const Panel = window.Panel = {
+    $, $$, esc, money, imgSrc, digits, price, lines, toast, busy, guard, CATS, catIdx, catName,
+    get products() { return products; },
+    get settings() { return settings || D.settings; },
+    productById: id => products.find(p => p.id === id),
+    // eventos: 'ready' (datos cargados), 'tab' (cambio de pestaña), 'products' (lista de productos nueva), 'logout'
+    on(ev, fn) { (listeners[ev] = listeners[ev] || []).push(fn); if (ev === 'ready' && fired.ready) fn(); },
+    emit(ev, data) { if (ev === 'ready') fired.ready = true; (listeners[ev] || []).forEach(fn => { try { fn(data); } catch (e) { console.error(e); } }); },
+    productExtra: () => '',          // stock.js lo reemplaza para mostrar los kilos en la lista
+    renderProducts: () => renderList(),
+    reloadProducts: () => loadAll(),
+    go: tab => goTab(tab),
+    currentTab: () => current,
+    openSheet, closeSheet
+  };
+
+  /* ---------- hojas apilables (pedido, cliente, stock) ---------- */
+  const stack = [];
+  function layerSheets() {
+    stack.forEach((s, i) => { s.style.zIndex = 42 + i * 2; });
+    const bg = $('#sheetBg2');
+    bg.hidden = !stack.length;
+    if (stack.length) bg.style.zIndex = 41 + (stack.length - 1) * 2;
+    document.body.style.overflow = stack.length || !$('#sheet').hidden ? 'hidden' : '';
+  }
+  function openSheet(el) {
+    const i = stack.indexOf(el); if (i >= 0) stack.splice(i, 1);
+    stack.push(el); el.hidden = false; el.scrollTop = 0; layerSheets();
+  }
+  function closeSheet(el) {
+    el = el || stack[stack.length - 1]; if (!el) return;
+    const i = stack.indexOf(el); if (i >= 0) stack.splice(i, 1);
+    el.hidden = true; layerSheets();
+    el.dispatchEvent(new CustomEvent('sheetclose'));
+  }
+  $('#sheetBg2').addEventListener('click', () => closeSheet());
+  document.addEventListener('click', e => { const b = e.target.closest('.sheet [data-close]'); if (b) closeSheet(b.closest('.sheet')); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && stack.length && $('#sheet').hidden) closeSheet(); });
+
   /* ---------- arranque ---------- */
   async function boot() {
     if (!window.SB || !SB.configured) return show('setup');
@@ -56,8 +98,12 @@
       show('login'); showLoginError(e.message); return;
     }
     show('app');
+    // en este navegador no se cuentan las visitas a la web (las del dueño no son clientes)
+    try { localStorage.setItem('sabor-no-contar', '1'); } catch (_) {}
     $('#accountEmail').textContent = 'Sesión iniciada como ' + (SB.session.email || '');
+    goTab((location.hash || '').slice(1) || 'inicio', true);
     await loadAll().catch(() => {});
+    Panel.emit('ready');
   }
 
   $('#loginForm').addEventListener('submit', async e => {
@@ -76,12 +122,23 @@
     e.currentTarget.setAttribute('aria-label', i.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
   });
 
-  /* ---------- pestañas ---------- */
-  $$('.tab').forEach(t => t.addEventListener('click', () => {
-    $$('.tab').forEach(x => { x.classList.toggle('is-active', x === t); x.setAttribute('aria-selected', String(x === t)); });
-    $$('.panel').forEach(p => p.hidden = p.id !== 'tab-' + t.dataset.tab);
-    scrollTo(0, 0);
-  }));
+  /* ---------- pestañas (con #pestaña en la dirección, así anda el botón «atrás») ---------- */
+  let current = '';
+  const TABS = $$('.tab').map(t => t.dataset.tab);
+  function goTab(tab, replace) {
+    if (!TABS.includes(tab)) tab = 'inicio';
+    const changed = tab !== current;
+    current = tab;
+    $$('.tab').forEach(x => { const on = x.dataset.tab === tab; x.classList.toggle('is-active', on); x.setAttribute('aria-selected', String(on)); });
+    $$('.panel').forEach(p => p.hidden = (p.dataset.group || p.id.replace(/^tab-/, '')) !== tab);
+    const h = '#' + tab;
+    if (location.hash !== h) { replace ? history.replaceState(null, '', h) : history.pushState(null, '', h); }
+    if (changed) { scrollTo(0, 0); Panel.emit('tab', tab); }
+  }
+  $$('.tab').forEach(t => t.addEventListener('click', () => goTab(t.dataset.tab)));
+  addEventListener('hashchange', () => { if (!$('#viewApp').hidden) goTab(location.hash.slice(1), true); });
+  addEventListener('popstate', () => { if (!$('#viewApp').hidden) goTab(location.hash.slice(1), true); });
+  $('#refreshAll').addEventListener('click', async () => { await loadAll().catch(() => {}); Panel.emit('refresh'); });
 
   /* ---------- datos ---------- */
   async function loadAll() {
@@ -95,6 +152,7 @@
       if (!settings) settings = (await SB.insert('settings', { id: 1, ...D.settings }))[0];
     });
     renderList(); fillSettings();
+    Panel.emit('products');
   }
 
   /* ---------- lista de productos ---------- */
@@ -108,9 +166,11 @@
           <b>${esc(p.nombre)}</b>
           <span><span class="nw">½ kg ${money(p.precio_medio)}</span> · <span class="nw">1 kg ${money(p.precio_kilo)}</span></span>
           <div class="chips">${p.a_pedido ? '<span class="chip">A pedido</span>' : ''}${p.en_mix ? '<span class="chip">Mix</span>' : ''}${(p.fotos || []).length ? `<span class="chip">${(p.fotos || []).length + (p.img ? 1 : 0)} fotos</span>` : ''}${p.disponible ? '' : '<span class="chip">Sin stock</span>'}</div>
+          ${Panel.productExtra(p)}
         </div>
         <div class="pside">
           <label class="switch" title="Hay stock"><input type="checkbox" data-stock ${p.disponible ? 'checked' : ''} aria-label="Hay stock de ${esc(p.nombre)}"><span></span></label>
+          <button type="button" class="btn btn-ghost btn-xs" data-stock-open aria-label="Stock de ${esc(p.nombre)}">Stock</button>
           <div class="order">
             <button type="button" data-move="-1" ${i === 0 || catIdx(products[i - 1]) !== catIdx(p) ? 'disabled' : ''} aria-label="Subir">▲</button>
             <button type="button" data-move="1" ${i === products.length - 1 || catIdx(products[i + 1]) !== catIdx(p) ? 'disabled' : ''} aria-label="Bajar">▼</button>
@@ -333,7 +393,7 @@
     if (a !== b) return toast('Las contraseñas no coinciden.', true);
     try { await guard(() => SB.setPassword(a), 'Contraseña cambiada ✓'); f.reset(); } catch (_) {}
   });
-  $('#logout').addEventListener('click', async () => { await SB.signOut(); show('login'); showLoginError(''); });
+  $('#logout').addEventListener('click', async () => { Panel.emit('logout'); await SB.signOut(); show('login'); showLoginError(''); });
 
   boot();
 })();

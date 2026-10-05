@@ -56,6 +56,28 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
   - Insertar, editar y borrar: solo si `is_admin()`.
   - Bucket `fotos` público para leer; subir y borrar solo admin.
 
+## CRM del panel (`/admin`)
+
+- Pestañas: Inicio (resumen), Pedidos, Clientes, Productos (con stock), Visitas y Ajustes (negocio + cuenta).
+  - Celular: barra de pestañas fija abajo. Compu (≥900px): menú a la izquierda. La pestaña va en la dirección (`/admin#pedidos`).
+  - Pedidos, clientes y stock se abren como hojas apilables (`Panel.openSheet / closeSheet`).
+- Archivos:
+  - `admin/admin.js`: núcleo (login, pestañas, productos, negocio, cuenta). Expone `window.Panel` (helpers, eventos `ready` / `tab` / `products` / `refresh` / `logout`, hojas).
+  - `admin/crm.js`: Inicio, Pedidos y Clientes (estados, cobro, unir duplicados, CSV para Excel con `;` y BOM, aviso de pedidos nuevos cada 60 s).
+  - `admin/stock.js`: stock en kg por producto (entradas, mermas, correcciones, aviso de mínimo).
+  - `admin/visitas.js`: estadísticas de visitas. `admin/charts.js`: gráficos SVG propios (sin librerías).
+  - `js/track.js` (solo en la web pública): contador anónimo. `SaborTrack.evento('carrito' | 'pedido' | 'whatsapp')`.
+- La web guarda cada pedido al tocar «Enviar pedido por WhatsApp» (`crear_pedido_web`, con `keepalive`, sin frenar el envío). Campo opcional «Tu WhatsApp» en el formulario.
+- Base (migración `supabase/migrations/20261004_crm.sql`):
+  - `clientes` (nombre, telefono solo dígitos, email, direccion, cumple, etiquetas, notas, origen).
+  - `pedidos` (codigo = el N.º del mensaje de WhatsApp, cliente_id, items jsonb `[{product_id, nombre, size, opt, qty, unit, mix?}]`, kg, envio, total, estado `nuevo|confirmado|entregado|cancelado`, pagado, origen `web|manual`).
+  - `inventario` (stock_kg, minimo_kg) y `movimientos_stock` (delta, motivo `produccion|venta|devolucion|ajuste|merma`).
+  - `eventos`: visitas anónimas (id al azar del navegador, sin IP). Se borran solas a los ~13 meses.
+  - Triggers: al pasar un pedido a «entregado» se descuenta el stock (el mix se reparte entre sus variedades); si vuelve atrás, se cancela o se borra, se devuelve. Stock ≤ 0 → `products.disponible = false`; con stock → `true`.
+  - Seguridad: RLS en todo; solo `is_admin()` lee o escribe. anon solo puede llamar a `crear_pedido_web` y `registrar_evento` (SECURITY DEFINER, validan y recortan todo, con freno anti-spam).
+- Ventas = pedidos confirmados + entregados. Los «nuevo» de la web pueden no concretarse.
+- El MCP de Supabase no puede aplicar sentencias `drop` / `delete` / `revoke` (piden una aprobación que no llega y se vencen): esas partes las corre el dueño en el SQL Editor.
+
 ## Reglas
 
 1. NUNCA uses la secret key ni la service_role en el frontend ni la commitees. Solo va la publishable key.

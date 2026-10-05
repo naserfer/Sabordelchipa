@@ -83,7 +83,8 @@
     insert: (table, row) => rest(table, { method: 'POST', headers: json, body: JSON.stringify(row) }),
     update: (table, match, patch) => rest(`${table}?${match}`, { method: 'PATCH', headers: json, body: JSON.stringify(patch) }),
     remove: (table, match) => rest(`${table}?${match}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }),
-    rpc: (fn, args = {}) => rest(`rpc/${fn}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(args) }),
+    // extra: opciones de fetch, por ejemplo { keepalive: true } para que termine aunque se cierre la página
+    rpc: (fn, args = {}, extra = {}) => rest(`rpc/${fn}`, { ...extra, method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(args) }),
 
     async signIn(email, password) {
       if (!configured) throw new Error('La base de datos no está configurada (js/config.js).');
