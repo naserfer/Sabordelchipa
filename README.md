@@ -1,6 +1,6 @@
 # Sabor del Chipá — web + panel de administración
 
-- **La web** (`/`): animación "Del freezer al horno", catálogo, armá tu mix, pedido por WhatsApp, mate y chipá, envíos y preguntas frecuentes.
+- **La web** (`/`): video "Del freezer al horno" (de crudos a dorados), catálogo, armá tu mix, pedido por WhatsApp, mate y chipá, envíos y preguntas frecuentes.
 - **El panel** (`/admin`): el dueño entra con su mail y contraseña y cambia productos, fotos, precios, stock, orden, WhatsApp, Instagram, días de envío, zona y el cartel de avisos. No hace falta tocar código.
 - **Base de datos, login y fotos**: Supabase, plan gratis.
 - **Hosting**: Cloudflare Pages, plan gratis. Es una web estática: se publica arrastrando la carpeta.
@@ -105,4 +105,4 @@ En el plan gratis, Supabase pausa el proyecto si pasa unos 7 días sin actividad
 - Animaciones: [anime.js](https://animejs.com) v4.5.0 (licencia MIT), incluido en `vendor/`.
 - Tipografías: Playfair Display y Montserrat (licencia SIL Open Font), incluidas en `fonts/`.
 - Fotos: de las publicaciones de @sabordelchipa.
-- Ilustraciones (horno, sol, fileteado, mate, Obelisco): dibujadas a mano en SVG para este sitio.
+- Ilustraciones (sol, fileteado, mate, Obelisco): dibujadas a mano en SVG para este sitio.

@@ -1,263 +1,151 @@
 /* =========================================================
    Sabor del Chipá — animaciones con anime.js v4
-   La estrella: "Del freezer al horno" sincronizada al scroll.
+   Arriba de todo: el video del horno (crudos → dorados) con el
+   reloj, la barra y los pasos sincronizados al video.
    ========================================================= */
 (function () {
   'use strict';
-  if (!window.anime) { document.documentElement.classList.remove('js'); return; }
-  const { animate, createTimeline, onScroll, stagger, svg, utils } = window.anime;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const coarse = matchMedia('(pointer: coarse)').matches;
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-  const mix = (a, b, t) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], t))).join(',')})`; };
-  const easeInOut = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
   /* ---------------------------------------------------------
-     1. EL CHIPÁ: forma orgánica generada (cruda → inflada)
+     1. HERO: video del horno
+        Se repite en bucle, sin sonido, mientras se ve: los chipás se
+        doran, se quedan un momento listos y vuelve a empezar.
+        El reloj va de 0 a 20 min al ritmo del video y los pasos
+        se marcan solos. Fuera de pantalla se pausa.
+        Con movimiento reducido o ahorro de datos no arranca solo:
+        se ve el chipá ya dorado y un botón para mirarlo una vez.
+        No depende de anime.js (si no carga, el video igual anda).
      --------------------------------------------------------- */
-  const CX = 300, CY = 360, N = 40;
-  function rand(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
-  const rnd = rand(7);
-  const noiseA = Array.from({ length: N }, () => rnd());
-  function shape(R, bumps, flat, lift) {
-    return Array.from({ length: N }, (_, i) => {
-      const a = (i / N) * Math.PI * 2;
-      const n = 1 + bumps * (Math.sin(a * 3 + 1.3) * .5 + Math.sin(a * 5 + .4) * .3 + (noiseA[i] - .5) * .5);
-      const r = R * n;
-      const sy = Math.sin(a) > 0 ? flat : 1;           // base más plana
-      return [CX + Math.cos(a) * r, CY - lift + Math.sin(a) * r * sy];
-    });
-  }
-  const RAW = shape(104, .035, .78, 0);
-  const BAKED = shape(128, .07, .70, 10);
-  function pathFrom(pts) {
-    let d = '';
-    for (let i = 0; i < pts.length; i++) {
-      const p0 = pts[(i - 1 + N) % N], p1 = pts[i], p2 = pts[(i + 1) % N], p3 = pts[(i + 2) % N];
-      if (i === 0) d += `M${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`;
-      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
-      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
-    }
-    return d + 'Z';
-  }
+  (function ovenHero() {
+    const win = $('#ovenWindow'), video = $('#ovenVideo');
+    if (!win || !video) return;
+    const btn = $('#ovenPlay');
+    const timeEl = $('#timeVal'), bar = $('#ovenProgress'), steps = $$('#horno .step');
+    const saveData = !!(navigator.connection && navigator.connection.saveData);
+    const looping = !reduce && !saveData;
+    const HOLD = 1800, FADE = 350;   // cuánto se queda en el chipá dorado y cuánto dura el fundido
+    let lastStep = -1, lastMin = -1, lastP = -1, raf = 0, started = false, visible = false, holdT = 0;
 
-  // manchitas de queso
-  const spotsG = $('#spots');
-  if (spotsG) {
-    const r2 = rand(42); let html = '';
-    for (let i = 0; i < 26; i++) {
-      const a = r2() * Math.PI * 2, d = Math.sqrt(r2()) * 112;
-      const x = CX + Math.cos(a) * d, y = CY - 18 + Math.sin(a) * d * .78;
-      const rx = 4 + r2() * 7, ry = rx * (.55 + r2() * .35), rot = r2() * 180;
-      html += `<ellipse class="spot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${rot.toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    function setStep(i) {
+      if (i === lastStep) return;
+      steps.forEach((s, k) => { s.classList.toggle('is-active', k === i); s.classList.toggle('is-done', k < i); });
+      lastStep = i;
     }
-    // envolvemos cada mancha en <g> para que anime.js controle la escala sin pisar el rotate del atributo
-    spotsG.innerHTML = html.replace(/<ellipse class="spot"/g, '<g class="spot"><ellipse').replace(/\/>/g, '/></g>');
-  }
-  // chispas de calor que suben dentro del horno
-  const embersG = $('#embers');
-  if (embersG) {
-    const r3 = rand(99); let html = '';
-    for (let i = 0; i < 16; i++) {
-      const x = 90 + r3() * 420, y = 470 + r3() * 40, r = 1.6 + r3() * 2.4;
-      html += `<circle class="ember" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${r3() > .5 ? '#FFB45A' : '#FF7A22'}"/>`;
-    }
-    embersG.innerHTML = html;
-  }
-  // los copos tienen transform como atributo: los envolvemos para poder animarlos
-  $$('#snow .flake').forEach(f => {
-    const w = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    w.setAttribute('transform', f.getAttribute('transform')); f.removeAttribute('transform');
-    f.parentNode.insertBefore(w, f); w.appendChild(f);
-  });
-
-  /* ---------------------------------------------------------
-     2. Render del estado (lo llama la línea de tiempo)
-     --------------------------------------------------------- */
-  const el = {
-    body: $('#chipaBody'), crust: $('#chipaCrust'), clip: $('#bodyClipPath'),
-    s0: $('#dStop0'), s1: $('#dStop1'), s2: $('#dStop2'),
-    tex: $('#chipaTex'), rim: $('#chipaRim'), frost: $('#frost'), snow: $('#snow'), bgOven: $('#bgOven'), glow: $('#ovenGlow'),
-    rods: $('#rods'), rodPaths: $$('#rods .rod'), rackLine: $('#rackLine'), rackBars: $('#rackBars'),
-    embers: $('#embers'), sun: $('#sunWrap'), frame: $('#ovenFrame'), shine: $('#glassShine'), shadow: $('#chipaShadow'), steamG: $('#steamGroup'),
-    spots: $$('#spots ellipse'), temp: $('#tempVal'), minus: $('#tempMinus'), thermo: $('#thermoFill'), time: $('#timeVal'), ring: $('#timeRing'),
-    progress: $('#ovenProgress'), steps: $$('.step'), sticky: $('.oven-sticky'), hint: $('.scroll-hint')
-  };
-  const st = { frost: 1, oven: 0, glow: 0, heat: 0, puff: 0, temp: -18, time: 0, steam: 0 };
-  let lastStep = -1;
-  const prev = { puff: NaN, heat: NaN, oven: NaN, glow: NaN, frost: NaN, steam: NaN, temp: NaN, time: NaN, rodGlow: false, bg: '' };
-
-  function render(progress) {
-    if (!el.body) return;
-    if (Number.isNaN(prev.puff) || Math.abs(st.puff - prev.puff) > .001) {
-      prev.puff = st.puff;
-      const pts = RAW.map((p, i) => [lerp(p[0], BAKED[i][0], st.puff), lerp(p[1], BAKED[i][1], st.puff)]);
-      const d = pathFrom(pts);
-      el.body.setAttribute('d', d); el.crust.setAttribute('d', d); el.clip.setAttribute('d', d);
-      el.shadow.setAttribute('rx', lerp(104, 132, st.puff).toFixed(1));
-    }
-
-    if (Number.isNaN(prev.heat) || Math.abs(st.heat - prev.heat) > .004) {
-      prev.heat = st.heat;
-      const h = easeInOut(clamp(st.heat));
-      el.s0.setAttribute('stop-color', mix('#FBF4E2', '#FBD891', h));
-      el.s1.setAttribute('stop-color', mix('#EFE3C6', '#E7A955', h));
-      el.s2.setAttribute('stop-color', mix('#D8C6A0', '#B8692A', h));
-      el.crust.setAttribute('opacity', (Math.pow(h, 1.4) * .9).toFixed(3));
-      el.tex.setAttribute('opacity', (.14 + h * .26).toFixed(3));
-      const spotFill = mix('#F4E4B4', '#B4561A', h);
-      el.spots.forEach(s => s.setAttribute('fill', spotFill));
-    }
-
-    if (st.frost !== prev.frost) {
-      prev.frost = st.frost;
-      el.frost.setAttribute('opacity', st.frost.toFixed(3));
-      el.snow.setAttribute('opacity', st.frost.toFixed(3));
-    }
-    if (st.oven !== prev.oven) {
-      prev.oven = st.oven;
-      el.bgOven.setAttribute('opacity', st.oven.toFixed(3));
-      el.rods.setAttribute('opacity', st.oven.toFixed(3));
-      const rackC = mix('#E9F2F7', '#3B2416', st.oven);
-      el.rackLine.setAttribute('stroke', rackC); el.rackBars.setAttribute('stroke', rackC);
-      el.frame.setAttribute('stroke-opacity', (st.oven * .55).toFixed(3));
-      el.shine.setAttribute('opacity', (st.oven * .05).toFixed(3));
-      el.shadow.setAttribute('opacity', lerp(.16, .5, st.oven).toFixed(3));
-      const bg = mix('#FBF6EC', '#F6E7CF', st.oven);
-      if (bg !== prev.bg) { prev.bg = bg; el.sticky.style.setProperty('background-color', bg); }
-    }
-    if (st.glow !== prev.glow) {
-      prev.glow = st.glow;
-      el.rim.setAttribute('opacity', (st.glow * .85).toFixed(3));
-      el.glow.setAttribute('opacity', st.glow.toFixed(3));
-      el.embers.setAttribute('opacity', clamp(st.glow * 1.1).toFixed(3));
-      const rodC = mix('#4A2512', '#FF7A22', clamp(st.glow * 1.2));
-      const wantGlow = !coarse && st.glow > .3;
-      el.rodPaths.forEach(r => {
-        r.style.stroke = rodC;
-        if (wantGlow !== prev.rodGlow) r.setAttribute('filter', wantGlow ? 'url(#fRodGlow)' : '');
-      });
-      prev.rodGlow = wantGlow;
-    }
-    if (st.steam !== prev.steam) {
-      prev.steam = st.steam;
-      el.steamG.setAttribute('opacity', st.steam.toFixed(3));
-      el.sun.setAttribute('opacity', (st.steam * .72).toFixed(3));
-    }
-
-    const t = Math.round(st.temp);
-    if (t !== prev.temp) {
-      prev.temp = t;
-      el.temp.textContent = Math.abs(t); el.minus.style.display = t < 0 ? '' : 'none';
-      el.thermo.style.width = (4 + clamp((t + 18) / 218) * 96).toFixed(1) + '%';
-    }
-    const tm = Math.round(st.time);
-    if (tm !== prev.time) {
-      prev.time = tm;
-      el.time.textContent = tm;
-      el.ring.style.strokeDashoffset = (113.1 * (1 - clamp(tm / 20))).toFixed(2);
-    }
-
-    if (progress != null) {
-      el.progress.style.width = (progress * 100).toFixed(1) + '%';
-      const step = progress < .16 ? 0 : progress < .36 ? 1 : progress < .86 ? 2 : 3;
-      if (step !== lastStep) {
-        el.steps.forEach((s, i) => { s.classList.toggle('is-active', i === step); s.classList.toggle('is-done', i < step); });
-        if (lastStep !== -1 && !reduce) animate(el.steps[step], { scale: [.96, 1], duration: 500, ease: 'outBack(2)' });
-        lastStep = step;
+    function render(p) {
+      p = clamp(p);
+      const min = Math.round(p * 20);
+      if (min !== lastMin) { lastMin = min; timeEl.textContent = min; }
+      if (Math.abs(p - lastP) > .002 || p === 0 || p === 1) {
+        lastP = p;
+        bar.style.width = (p * 100).toFixed(1) + '%';
+        win.style.setProperty('--p', p.toFixed(3));
       }
-      if (el.hint) el.hint.style.opacity = String(clamp(1 - progress * 8));
+      // 1 del freezer · 2 horno a 200 °C · 3 se dora · 4 ¡listo!
+      setStep(p >= .985 ? 3 : p > .26 ? 2 : p > .1 ? 1 : 0);
     }
-  }
+    const progress = () => (video.duration ? video.currentTime / video.duration : 0);
+    function tick() {
+      render(progress());
+      if (!video.paused && !video.ended) raf = requestAnimationFrame(tick);
+    }
+    function play() {
+      started = true;
+      const pr = video.play();
+      // si el navegador no deja arrancar solo (p. ej. iPhone en modo ahorro), queda el botón
+      if (pr && pr.catch) pr.catch(() => { btn.hidden = false; });
+    }
+    // vuelta a empezar: fundido corto a oscuro y de nuevo los chipás crudos
+    function restart() {
+      clearTimeout(holdT);
+      if (!visible) return;   // se retoma cuando la ventana vuelva a verse
+      win.classList.add('is-fading');
+      holdT = setTimeout(() => {
+        video.currentTime = 0; render(0);
+        win.classList.remove('is-fading');
+        play();
+      }, FADE);
+    }
 
-  /* ---------------------------------------------------------
-     3. Línea de tiempo sincronizada al scroll
-     --------------------------------------------------------- */
-  if (reduce) {
-    Object.assign(st, { frost: 0, oven: 1, glow: .75, heat: 1, puff: 1, temp: 200, time: 20, steam: 1 });
-    render(1);
-  } else if ($('#horno')) {
+    video.addEventListener('play', () => {
+      btn.hidden = true; win.classList.remove('is-done');
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    });
+    video.addEventListener('ended', () => {
+      cancelAnimationFrame(raf); render(1);
+      win.classList.add('is-done');
+      if (looping) holdT = setTimeout(restart, HOLD);
+      else btn.hidden = false;   // movimiento reducido: queda en el chipá dorado
+    });
+    btn.addEventListener('click', () => {
+      if (video.ended || video.currentTime > 0) video.currentTime = 0;
+      play();
+    });
+    // si el video no carga, mostramos la foto del chipá dorado
+    const lastSource = $$('source', video).pop();
+    if (lastSource) lastSource.addEventListener('error', () => { video.poster = video.dataset.posterEnd; render(1); btn.hidden = true; });
+
+    if (!looping) {
+      video.poster = video.dataset.posterEnd;
+      render(1);
+      btn.hidden = false;
+      return;
+    }
     render(0);
-    const steam = svg.createDrawable('.steam');
-    const tl = createTimeline({
-      defaults: { ease: 'linear' },
-      autoplay: onScroll({ target: '#horno', enter: 'top top', leave: 'bottom bottom', sync: coarse ? true : .18 }),
-      onUpdate: self => {
-        render(self.progress);
-        if (self.progress > .22) startOvenAmbient();
+    video.preload = 'auto';
+    if (!('IntersectionObserver' in window)) { visible = true; video.loop = true; play(); return; }
+    // arranca cuando la ventana del horno se ve (medio segundo después, para que se lea el título)
+    // y se pausa cuando sale de la pantalla
+    new IntersectionObserver(entries => {
+      visible = entries[entries.length - 1].isIntersecting;
+      if (!visible) {
+        clearTimeout(holdT); win.classList.remove('is-fading');
+        if (!video.paused) video.pause();
+        return;
       }
-    });
-    tl
-      // 1) sale del freezer: se va la escarcha y caen los copos
-      .add(st, { frost: 0, duration: 220, ease: 'inOutSine' }, 70)
-      .add('#snow .flake', { y: 60, opacity: 0, duration: 220, delay: stagger(12), ease: 'inQuad' }, 70)
-      .add('#chipa', { y: [{ to: -34, duration: 120, ease: 'outQuad' }, { to: 0, duration: 140, ease: 'outBounce' }], rotate: [{ to: -4, duration: 120 }, { to: 0, duration: 140 }] }, 110)
-      // 2) se prende el horno
-      .add(st, { oven: 1, duration: 200, ease: 'inOutSine' }, 120)
-      .add(st, { temp: 200, duration: 260, ease: 'outQuad' }, 120)
-      .add(st, { glow: .8, duration: 240, ease: 'inQuad' }, 200)
-      // 3) se hornea: se infla, se dora y aparecen las manchitas de queso
-      .add(st, { heat: 1, duration: 540, ease: 'inOutSine' }, 340)
-      .add(st, { puff: 1, duration: 420, ease: 'outCubic' }, 340)
-      .add('#chipa', { scaleY: [{ to: 1.06, duration: 220, ease: 'outQuad' }, { to: 1, duration: 200, ease: 'inOutSine' }], scaleX: [{ to: .97, duration: 220 }, { to: 1, duration: 200 }] }, 360)
-      .add(st, { time: 20, duration: 540 }, 340)
-      .add('.spot', { scale: [{ from: .5, to: 1.35, duration: 120, ease: 'outQuad' }, { to: 1, duration: 140, ease: 'inOutSine' }], delay: stagger(9, { from: 'center' }) }, 430)
-      // 4) ¡listo! sale el vapor
-      .add(st, { steam: 1, duration: 120 }, 860)
-      .add(steam, { draw: ['0 0', '0 1'], duration: 140, delay: stagger(20), ease: 'outQuad' }, 860)
-      .add('#chipa', { scale: [{ to: 1.05, duration: 60, ease: 'outQuad' }, { to: 1, duration: 80, ease: 'outBack(3)' }] }, 880)
-      .add(st, { glow: .95, duration: 120 }, 880)
-      .add('#sunRays', { scale: [.55, 1], duration: 140, ease: 'outBack(2)' }, 860);
+      if (!started) { setTimeout(() => { if (visible && !started) play(); }, 500); return; }
+      if (video.ended) restart();
+      else if (video.paused && btn.hidden) play();
+    }, { threshold: .25 }).observe(win);
+  })();
 
-    // loops ambientales: en el celular no arrancan hasta que el horno ya se ve
-    if (!coarse) animate('#snow .flake', { rotate: '1turn', duration: 14000, loop: true, ease: 'linear' });
-    let ovenAmbient = false;
-    function startOvenAmbient() {
-      if (ovenAmbient) return;
-      ovenAmbient = true;
-      animate('.steam', { x: [-5, 5], duration: 1600, alternate: true, loop: true, ease: 'inOutSine', delay: stagger(260) });
-      animate('#sunRays', { rotate: '1turn', duration: 40000, loop: true, ease: 'linear' });
-      animate('.ember', {
-        y: () => utils.random(-320, -180), x: () => utils.random(-30, 30),
-        opacity: [{ to: 1, duration: 300 }, { to: 0, duration: 1500 }],
-        scale: [1, .3], duration: () => utils.random(1600, 2600), delay: () => utils.random(0, 2000),
-        loop: true, ease: 'outSine'
-      });
-    }
-    // el horno sigue el mouse con una leve inclinación 3D
-    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      const vis = $('.oven-visual');
-      vis.parentElement.style.perspective = '1400px';
-      addEventListener('pointermove', e => {
-        if (scrollY > $('#horno').offsetHeight) return;
-        const rx = (e.clientY / innerHeight - .5) * -6, ry = (e.clientX / innerWidth - .5) * 8;
-        animate(vis, { rotateX: rx, rotateY: ry, duration: 900, ease: 'outQuad' });
-      }, { passive: true });
-    }
-  }
+  if (!window.anime) { document.documentElement.classList.remove('js'); return; }
+  const { animate, createTimeline, stagger, svg, utils } = window.anime;
 
   /* ---------------------------------------------------------
-     4. Intro al cargar
+     2. Intro al cargar
      --------------------------------------------------------- */
   if (!reduce) {
     animate('.hero-title .word', { y: ['110%', '0%'], opacity: [0, 1], duration: 1100, delay: stagger(70, { start: 150 }), ease: 'outExpo' });
     animate('[data-intro]', { y: [18, 0], opacity: [0, 1], duration: 900, delay: stagger(120, { start: 450 }), ease: 'outExpo' });
     animate('.steps .step', { x: [-16, 0], opacity: { from: 0 }, duration: 800, delay: stagger(70, { start: 650 }), ease: 'outExpo',
-      onComplete: () => $$('.steps .step').forEach(s => s.style.opacity = '') });
-    animate('.oven-visual', { scale: [.88, 1], opacity: [0, 1], duration: 1300, delay: 200, ease: 'outElastic(1, .7)' });
-    animate('#chipaInner', { y: [-120, 0], duration: 1100, delay: 600, ease: 'outBounce' });
-    animate('.hud-temp', { x: [-30, 0], opacity: [0, 1], duration: 900, delay: 900, ease: 'outExpo' });
-    animate('.hud-time', { x: [30, 0], opacity: [0, 1], duration: 900, delay: 1000, ease: 'outExpo' });
+      onComplete: () => $$('.steps .step').forEach(s => { s.style.opacity = ''; s.style.transform = ''; }) });
+    animate('.oven-window', { y: [26, 0], opacity: [0, 1], duration: 1100, delay: 200, ease: 'outExpo' });
     animate('.nav', { y: ['-100%', '0%'], duration: 900, ease: 'outExpo' });
   }
 
+
   /* ---------------------------------------------------------
-     5. Marquee
+     2a. "Hacé tu pedido": al tocarlo, un cartelito explica qué hacer
+         al llegar a las variedades.
+     --------------------------------------------------------- */
+  const orderBtn = $('[data-order-cta]');
+  if (orderBtn) orderBtn.addEventListener('click', () => {
+    const toastEl = $('#toast');
+    if (!toastEl || !window.SaborFX) return;
+    setTimeout(() => {
+      const msg = 'Elegí tus chipás y tocá «Sumar al pedido»';
+      toastEl.textContent = msg;
+      window.SaborFX.toast(toastEl);
+      setTimeout(() => { if (toastEl.textContent === msg) window.SaborFX.toast(toastEl, true); }, 4000);
+    }, 700);
+  });
+
+  /* ---------------------------------------------------------
+     3. Marquee
      --------------------------------------------------------- */
   if (!reduce) {
     animate('.marquee-track', { x: ['0%', '-50%'], duration: 40000, ease: 'linear', loop: true });
@@ -266,7 +154,7 @@
   }
 
   /* ---------------------------------------------------------
-     5a. "Escribinos": cuando le pasás el mouse, no te suelta por 4 segundos.
+     3a. "Escribinos": cuando le pasás el mouse, no te suelta por 4 segundos.
          El botón sigue al cursor con una correa elástica (se estira, pero no se
          va más lejos que LEASH), muestra un globito con cuenta regresiva y
          suelta con un rebote. Solo con mouse y sin movimiento reducido.
@@ -344,7 +232,7 @@
   }
 
   /* ---------------------------------------------------------
-     5b. Mate y chipá: el termo ceba, sube la espuma y el vapor
+     3b. Mate y chipá: el termo ceba, sube la espuma y el vapor
      --------------------------------------------------------- */
   onceVisible($('#mateSvg'), () => {
     if (reduce) return;
@@ -363,7 +251,7 @@
   }, '-5% 0px');
 
   /* ---------------------------------------------------------
-     6. Revelados al entrar en pantalla
+     4. Revelados al entrar en pantalla
      --------------------------------------------------------- */
   function onceVisible(target, cb, margin = '-12% 0px') {
     if (!target) return;
@@ -456,7 +344,7 @@
   });
 
   /* ---------------------------------------------------------
-     7. FX del pedido (los usa app.js)
+     5. FX del pedido (los usa app.js)
      --------------------------------------------------------- */
   const fab = $('.cart-fab');
   let fabShown = false;

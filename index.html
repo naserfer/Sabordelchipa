@@ -15,6 +15,7 @@
   <meta property="og:locale" content="es_AR">
   <link rel="preload" href="fonts/playfair-display-latin-wght-italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/montserrat-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="video/horno-crudo.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="css/styles.css">
   <script type="application/ld+json">
   {
@@ -76,16 +77,16 @@
       <a href="#envios">Envíos</a>
     </nav>
     <button class="btn btn-primary btn-sm nav-cta" type="button" data-open-cart>
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M6 7h12l-1 13H7L6 7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M2.6 4h2.5l2.2 10.5a1.6 1.6 0 0 0 1.6 1.3h8.5a1.6 1.6 0 0 0 1.5-1.2l1.7-6.4H6.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.7" cy="19.6" r="1.6" fill="currentColor"/><circle cx="17.1" cy="19.6" r="1.6" fill="currentColor"/></svg>
       Mi pedido <span class="nav-count" data-cart-count>0</span>
     </button>
   </header>
 
   <main id="top">
-    <!-- ================= HERO: DEL FREEZER AL HORNO ================= -->
-    <section class="oven-scroll" id="horno" aria-label="Del freezer al horno en 20 minutos">
-      <div class="oven-sticky">
-        <div class="oven-copy">
+    <!-- ================= HERO: DEL FREEZER AL HORNO (video) ================= -->
+    <section class="hero" id="horno" aria-label="Del freezer al horno en 20 minutos">
+      <div class="hero-inner">
+        <div class="hero-copy">
           <p class="eyebrow" data-intro><span class="bandera" aria-hidden="true"></span>Chipá artesanal · hecho en Buenos Aires</p>
           <h1 class="hero-title">
             <span class="line"><span class="word">Del</span> <span class="word">freezer</span></span>
@@ -114,7 +115,11 @@
           </ol>
 
           <div class="hero-cta" data-intro>
-            <a class="btn btn-primary" href="#variedades">Ver variedades</a>
+            <a class="btn-order" href="#variedades" data-order-cta>
+              <span class="bo-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25"><path d="M2.6 4h2.5l2.2 10.5a1.6 1.6 0 0 0 1.6 1.3h8.5a1.6 1.6 0 0 0 1.5-1.2l1.7-6.4H6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.7" cy="19.6" r="1.6" fill="currentColor"/><circle cx="17.1" cy="19.6" r="1.6" fill="currentColor"/></svg></span>
+              <span class="bo-txt"><b>Hacé tu pedido</b><small>Elegí tus chipás y te lo llevamos</small></span>
+              <svg class="bo-go" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
             <a class="btn btn-wa" data-wa-link data-magnet href="#" target="_blank" rel="noopener">
               <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
               Escribinos
@@ -122,149 +127,32 @@
           </div>
         </div>
 
-        <div class="oven-visual" aria-hidden="true">
-          <svg id="ovenSvg" viewBox="0 0 600 600" role="img">
-            <defs>
-              <linearGradient id="gFreezer" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#F3F8FB"/>
-                <stop offset="1" stop-color="#B7D0E0"/>
-              </linearGradient>
-              <radialGradient id="gOven" cx="50%" cy="62%" r="70%">
-                <stop offset="0" stop-color="#6B3112"/>
-                <stop offset=".55" stop-color="#3A1A0B"/>
-                <stop offset="1" stop-color="#170A04"/>
-              </radialGradient>
-              <radialGradient id="gGlow" cx="50%" cy="100%" r="75%">
-                <stop offset="0" stop-color="#FF8A2A" stop-opacity=".85"/>
-                <stop offset=".6" stop-color="#FF6A1A" stop-opacity=".18"/>
-                <stop offset="1" stop-color="#FF6A1A" stop-opacity="0"/>
-              </radialGradient>
-              <radialGradient id="gDough" cx="42%" cy="34%" r="72%">
-                <stop id="dStop0" offset="0" stop-color="#FBF4E2"/>
-                <stop id="dStop1" offset=".55" stop-color="#EFE3C6"/>
-                <stop id="dStop2" offset="1" stop-color="#D8C6A0"/>
-              </radialGradient>
-              <radialGradient id="gCrust" cx="45%" cy="38%" r="68%">
-                <stop offset=".45" stop-color="#9A4A16" stop-opacity="0"/>
-                <stop offset=".85" stop-color="#9A4A16" stop-opacity=".55"/>
-                <stop offset="1" stop-color="#6E300C" stop-opacity=".9"/>
-              </radialGradient>
-              <radialGradient id="gSpot" cx="40%" cy="35%" r="70%">
-                <stop offset="0" stop-color="#F0A04A"/>
-                <stop offset="1" stop-color="#B4561A"/>
-              </radialGradient>
-              <filter id="fBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
-              <filter id="fSoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter>
-              <filter id="fRodGlow" filterUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-              <pattern id="pTex" patternUnits="userSpaceOnUse" width="180" height="180"><image href="img/textura-masa.png" width="180" height="180"/></pattern>
-              <radialGradient id="gSunGlow"><stop offset=".35" stop-color="#FFC54A" stop-opacity=".55"/><stop offset="1" stop-color="#FFC54A" stop-opacity="0"/></radialGradient>
-              <radialGradient id="gRim" cx="50%" cy="100%" r="60%">
-                <stop offset="0" stop-color="#FF9A3C" stop-opacity=".55"/>
-                <stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/>
-              </radialGradient>
-              <clipPath id="clipPanel"><rect x="20" y="20" width="560" height="560" rx="40"/></clipPath>
-              <clipPath id="clipBody"><path id="bodyClipPath" d=""/></clipPath>
-            </defs>
-
-            <g clip-path="url(#clipPanel)">
-              <rect x="20" y="20" width="560" height="560" fill="url(#gFreezer)"/>
-              <g id="bgOven" opacity="0">
-                <rect x="20" y="20" width="560" height="560" fill="url(#gOven)"/>
-                <rect id="ovenGlow" x="20" y="20" width="560" height="560" fill="url(#gGlow)" opacity="0"/>
-                <!-- paredes del horno -->
-                <path d="M20 20 L110 110 M580 20 L490 110 M20 580 L110 490 M580 580 L490 490" stroke="#000" stroke-opacity=".25" stroke-width="2"/>
-                <rect x="110" y="110" width="380" height="380" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="2"/>
-              </g>
-
-              <!-- escarcha y copos -->
-              <g id="snow">
-                <g class="flake" transform="translate(90 120)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(500 90) scale(.8)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(520 300) scale(.6)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(70 380) scale(.7)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(160 60) scale(.5)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(430 520) scale(.9)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(300 70) scale(.55)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <g class="flake" transform="translate(120 520) scale(.6)"><path d="M0-14V14M-12-7 12 7M-12 7 12-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
-                <path d="M20 20h150c-40 20-90 30-150 70Z M580 20H440c40 25 90 35 140 80Z" fill="#fff" opacity=".55" filter="url(#fBlur)"/>
-                <text x="300" y="548" text-anchor="middle" class="svg-label" fill="#5B7D93">FREEZER · −18 °C</text>
-              </g>
-
-              <!-- resistencias del horno -->
-              <g id="rods" opacity="0">
-                <path class="rod" d="M70 76 h460" stroke-width="10" stroke-linecap="round"/>
-                <path class="rod" d="M70 524 h460" stroke-width="10" stroke-linecap="round"/>
-                <text x="300" y="560" text-anchor="middle" class="svg-label" fill="#F2B47A">HORNO · 200 °C</text>
-              </g>
-
-              <!-- rejilla / bandeja -->
-              <g id="rack">
-                <path id="rackLine" d="M80 452 H520" stroke="#E9F2F7" stroke-width="6" stroke-linecap="round"/>
-                <path id="rackBars" d="M120 452 v26 M200 452 v26 M280 452 v26 M360 452 v26 M440 452 v26 M480 452 v26" stroke="#E9F2F7" stroke-width="4" stroke-linecap="round" opacity=".7"/>
-              </g>
-
-              <!-- chispas de calor -->
-              <g id="embers" opacity="0"></g>
-
-              <!-- vapor -->
-              <g id="steamGroup" opacity="0" filter="url(#fSoft)">
-                <path class="steam" d="M250 214 C 226 184, 272 160, 250 128 S 272 82, 252 52" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-opacity=".75"/>
-                <path class="steam" d="M302 200 C 280 168, 326 146, 302 112 S 324 62, 304 30" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-opacity=".8"/>
-                <path class="steam" d="M352 214 C 330 186, 376 162, 352 130 S 374 86, 354 56" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-opacity=".7"/>
-              </g>
-
-              <!-- sol que aparece cuando está listo -->
-              <g id="sunWrap" opacity="0" transform="translate(300 330)">
-                <circle r="190" fill="url(#gSunGlow)"/>
-                <g id="sunRays" fill="#F6B40E" opacity=".45"><path transform="rotate(0.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(22.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(45.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(67.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(90.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(112.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(135.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(157.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(180.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(202.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(225.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(247.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(270.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(292.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/><path transform="rotate(315.0) scale(6.4)" d="M-3.2 -19 L0 -47 L3.2 -19 Z"/><path transform="rotate(337.5) scale(6.4)" d="M-2.6 -19 C 3.5 -25 -3.5 -31 1.8 -37 C -1 -40 4 -43 1 -46 C 6 -42 1 -39 4.5 -35 C 0 -30 7 -25 2.6 -19 Z"/></g>
-              </g>
-
-              <!-- EL CHIPÁ -->
-              <ellipse id="chipaShadow" cx="300" cy="450" rx="122" ry="12" fill="#000" opacity=".18" filter="url(#fSoft)"/>
-              <g id="chipa">
-                <g id="chipaInner">
-                  <path id="chipaBody" d="" fill="url(#gDough)"/>
-                  <g clip-path="url(#clipBody)">
-                    <path id="chipaCrust" d="" fill="url(#gCrust)" opacity="0"/>
-                    <rect id="chipaTex" x="150" y="190" width="300" height="300" fill="url(#pTex)" opacity=".3"/>
-                    <g id="spots"></g>
-                    <rect id="chipaRim" x="150" y="330" width="300" height="160" fill="url(#gRim)" opacity="0"/>
-                    <ellipse cx="270" cy="282" rx="66" ry="30" fill="#fff" opacity=".3" filter="url(#fBlur)"/>
-                    <!-- escarcha sobre el chipá -->
-                    <g id="frost">
-                      <rect x="150" y="200" width="300" height="300" fill="#F4FAFF" opacity=".5"/>
-                      <g fill="#fff">
-                        <circle cx="230" cy="290" r="3"/><circle cx="270" cy="266" r="2"/><circle cx="330" cy="280" r="3.5"/>
-                        <circle cx="360" cy="330" r="2.5"/><circle cx="250" cy="350" r="2"/><circle cx="300" cy="330" r="3"/>
-                        <circle cx="210" cy="360" r="2.5"/><circle cx="380" cy="380" r="2"/><circle cx="290" cy="400" r="2.5"/>
-                        <circle cx="340" cy="420" r="2"/><circle cx="240" cy="410" r="2"/>
-                      </g>
-                      <path d="M214 300 l6 -6 M218 300 l-6 -6 M352 270 l7 -7 M356 270 l-7 -7 M300 380 l6 -6 M304 380 l-6 -6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
-            <!-- marco -->
-            <rect x="20" y="20" width="560" height="560" rx="40" fill="none" stroke="#2B1E16" stroke-opacity=".12" stroke-width="2"/>
-            <rect id="ovenFrame" x="34" y="34" width="532" height="532" rx="30" fill="none" stroke="#F7C98C" stroke-opacity="0" stroke-width="3"/>
-            <path id="glassShine" d="M80 40 L200 40 L60 400 L40 400 L40 120 Z" fill="#fff" opacity="0"/>
-          </svg>
-
-          <div class="hud hud-temp">
-            <span class="hud-label">Temperatura</span>
-            <span class="hud-value"><span class="minus" id="tempMinus">−</span><b id="tempVal">18</b><small>°C</small></span>
-            <span class="thermo"><i id="thermoFill"></i></span>
+        <!-- Ventana del horno: el video se repite en bucle, sin sonido. El reloj y los pasos siguen al video (anim.js). -->
+        <div class="oven-window" id="ovenWindow">
+          <div class="ow-glass">
+            <video id="ovenVideo" muted playsinline preload="metadata" width="1280" height="720"
+                   poster="video/horno-crudo.webp" data-poster-end="video/horno-listo.webp"
+                   disablepictureinpicture disableremoteplayback aria-hidden="true">
+              <source src="video/horno-chipas.mp4" type="video/mp4">
+              <source src="video/horno-chipas.webm" type="video/webm">
+            </video>
+            <button class="ow-btn" id="ovenPlay" type="button" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M8 5.5v13l10.5-6.5Z" fill="currentColor"/></svg>
+              <span>Ver cómo se hornea</span>
+            </button>
           </div>
-          <div class="hud hud-time">
-            <span class="hud-label">Tiempo</span>
-            <span class="hud-value"><b id="timeVal">0</b><small>min</small></span>
-            <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="18" class="ring-bg"/><circle id="timeRing" cx="22" cy="22" r="18" class="ring-fg"/></svg>
+          <div class="ow-panel" aria-hidden="true">
+            <span class="ow-stat">
+              <span class="ow-label"><i class="ow-led"></i>Horno</span>
+              <span class="ow-value"><b>200</b><small>°C</small></span>
+            </span>
+            <span class="ow-bar"><i id="ovenProgress"></i></span>
+            <span class="ow-stat ow-stat-time">
+              <span class="ow-label">Tiempo</span>
+              <span class="ow-value"><b id="timeVal">0</b><small>min</small></span>
+            </span>
           </div>
         </div>
-
-        <div class="oven-progress" aria-hidden="true"><i id="ovenProgress"></i></div>
-        <div class="scroll-hint" aria-hidden="true"><span>Deslizá para hornear</span><i></i></div>
       </div>
     </section>
 
@@ -645,7 +533,7 @@
 
   <!-- ================= PEDIDO ================= -->
   <button class="cart-fab" type="button" data-open-cart aria-label="Ver mi pedido">
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="M6 7h12l-1 13H7L6 7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="M2.6 4h2.5l2.2 10.5a1.6 1.6 0 0 0 1.6 1.3h8.5a1.6 1.6 0 0 0 1.5-1.2l1.7-6.4H6.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.7" cy="19.6" r="1.6" fill="currentColor"/><circle cx="17.1" cy="19.6" r="1.6" fill="currentColor"/></svg>
     <span class="cart-fab-count" data-cart-count>0</span>
   </button>
 
@@ -660,7 +548,7 @@
     <div class="drawer-body">
       <div class="cart-empty" id="cartEmpty">
         <p>Todavía no sumaste nada.</p>
-        <a class="btn btn-primary btn-sm" href="#variedades" data-close-cart>Ver variedades</a>
+        <a class="btn btn-primary btn-sm" href="#variedades" data-close-cart>Elegir chipás</a>
       </div>
       <ul class="cart-list" id="cartList"></ul>
       <div class="cart-total" id="cartTotalRow"><span>Total productos <small id="cartKg"></small></span><b id="cartTotal">$0</b></div>

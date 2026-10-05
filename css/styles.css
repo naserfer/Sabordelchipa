@@ -125,18 +125,19 @@ button { font: inherit; color: inherit; }
 .nav-links a:hover { color: var(--ink); }
 .nav-count { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--gold); color: #fff; font-size: 12px; font-weight: 700; }
 
-/* ============ HERO: horno con scroll ============ */
-.oven-scroll { position: relative; height: 420vh; }
-.oven-sticky {
-  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 32px;
-  padding: calc(var(--nav-h) + var(--aviso-h, 0px) + 16px) max(16px, calc((100vw - var(--wrap)) / 2)) 40px;
+/* ============ HERO: video del horno ============ */
+.hero {
+  position: relative;
   background:
     radial-gradient(1200px 600px at 85% 30%, rgba(217, 180, 90, .16), transparent 60%),
     var(--cream);
-  transition: background .4s;
 }
-.oven-copy { position: relative; z-index: 2; max-width: 520px; }
+.hero-inner {
+  min-height: 100vh; min-height: 100svh;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center; gap: 44px;
+  padding: calc(var(--nav-h) + var(--aviso-h, 0px) + 24px) max(16px, calc((100vw - var(--wrap)) / 2)) 48px;
+}
+.hero-copy { position: relative; z-index: 2; max-width: 520px; }
 .hero-title {
   font-family: var(--display); font-weight: 600;
   font-size: clamp(44px, 6.2vw, 84px); line-height: .98; letter-spacing: -.02em;
@@ -162,43 +163,73 @@ button { font: inherit; color: inherit; }
 .step-t b { font-size: 15px; }
 .step-t small { font-size: 13px; color: var(--muted); }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-copy .hero-cta { align-items: center; }
 
-.oven-visual { position: relative; width: 100%; max-width: 620px; justify-self: center; aspect-ratio: 1; border-radius: 12%; box-shadow: 0 28px 44px -16px rgba(43, 30, 22, .32); }
-#ovenSvg { width: 100%; height: 100%; overflow: visible; display: block; }
-#ovenSvg .svg-label { font: 700 13px var(--sans); letter-spacing: .2em; }
-#chipa, #chipaInner, .spot, .flake, .ember { transform-box: fill-box; transform-origin: center; }
-#chipa { transform-origin: 50% 85%; }
-.rod { stroke: #4A2512; }
-
-.hud {
-  position: absolute; display: flex; flex-direction: column; gap: 2px;
-  background: rgba(255, 253, 248, .92); border-radius: 18px; padding: 10px 14px 12px;
-  box-shadow: var(--shadow); min-width: 118px;
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+/* "Hacé tu pedido": el botón principal para pedir.
+   Botón de dos líneas (qué hace + qué pasa después), ícono de bolsa como "Mi pedido"
+   y flecha. Sin animaciones: solo se levanta un poquito al pasar el mouse. */
+.btn-order {
+  --o-bg: var(--ink); --o-fg: #FFF8EA; --o-sub: var(--gold-2); --o-ico-bg: var(--gold); --o-ico-fg: #fff;
+  display: inline-flex; align-items: center; gap: 14px; min-height: 64px; padding: 8px 22px 8px 9px;
+  border-radius: 999px; background: var(--o-bg); color: var(--o-fg); text-decoration: none;
+  box-shadow: 0 14px 28px -14px rgba(43, 30, 22, .7);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-.hud-label { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
-.hud-value { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
-.hud-value small { font-family: var(--sans); font-size: 13px; font-weight: 600; margin-left: 4px; color: var(--ink-2); }
-.hud-value .minus { font-family: var(--sans); font-weight: 600; margin-right: 1px; }
-.hud-temp { left: -6%; top: 12%; }
-.hud-time { right: -6%; bottom: 12%; padding-right: 64px; }
-.thermo { display: block; height: 6px; border-radius: 6px; background: var(--cream-2); overflow: hidden; margin-top: 6px; }
-.thermo i { display: block; height: 100%; width: 4%; border-radius: inherit; background: linear-gradient(90deg, #7FB3D5, #F2A541, #E2561B); }
-.ring { position: absolute; right: 12px; top: 50%; width: 44px; height: 44px; transform: translateY(-50%) rotate(-90deg); }
-.ring circle { fill: none; stroke-width: 5; }
-.ring-bg { stroke: var(--cream-2); }
-.ring-fg { stroke: var(--gold); stroke-linecap: round; stroke-dasharray: 113.1; stroke-dashoffset: 113.1; }
+.btn-order:hover { transform: translateY(-2px); box-shadow: 0 18px 32px -14px rgba(43, 30, 22, .8); }
+.btn-order:hover .bo-go { transform: translateX(3px); }
+.btn-order:active { transform: translateY(0) scale(.98); }
+.btn-order:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.bo-ico { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--o-ico-bg); color: var(--o-ico-fg); }
+.bo-txt { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; text-align: left; }
+.bo-txt b { font-size: 18px; font-weight: 700; letter-spacing: .005em; }
+.bo-txt small { font-size: 12.5px; font-weight: 500; color: var(--o-sub); }
+.bo-go { flex: none; margin-left: auto; transition: transform .2s ease; }
 
-.oven-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(43, 30, 22, .06); }
-.oven-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #7FB3D5, var(--gold), var(--crust)); }
-.scroll-hint {
-  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+/* Ventana del horno: marco oscuro, video 16:9 y un panel con temperatura, barra y reloj.
+   --p (0 a 1) lo actualiza anim.js con el avance del video: el resplandor crece al dorarse. */
+.oven-window {
+  --p: 0;
+  position: relative; width: 100%; max-width: 660px; justify-self: center;
+  padding: 12px 12px 10px; border-radius: 30px;
+  background: linear-gradient(160deg, #3A2618, var(--oven) 55%);
+  box-shadow:
+    0 30px 50px -20px rgba(43, 30, 22, .45),
+    0 0 calc(24px + 46px * var(--p)) calc(-8px + 10px * var(--p)) rgba(255, 138, 42, calc(.16 + .34 * var(--p))),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
 }
-.scroll-hint i { width: 22px; height: 34px; border: 2px solid currentColor; border-radius: 12px; position: relative; }
-.scroll-hint i::after { content: ''; position: absolute; left: 50%; top: 7px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: currentColor; animation: wheel 1.6s ease-in-out infinite; }
-@keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(10px); opacity: 0; } 100% { opacity: 0; } }
+.ow-glass { position: relative; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: #120A05; isolation: isolate; }
+.ow-glass video { display: block; width: 100%; height: 100%; object-fit: cover; transition: opacity .35s ease; }
+.oven-window.is-fading video { opacity: 0; }   /* fundido corto al volver a empezar el bucle */
+/* reflejo suave del vidrio de la puerta */
+.ow-glass::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(118deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, 0) 32%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06), inset 0 0 36px rgba(0, 0, 0, .35);
+}
+/* "Ver cómo se hornea": solo aparece si el video no arranca solo (movimiento reducido, ahorro de datos o el navegador no deja) */
+.ow-btn {
+  position: absolute; z-index: 2; inset: 0; margin: auto; width: max-content; height: max-content;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  font: 600 14px var(--sans); color: var(--ink);
+  background: rgba(255, 253, 248, .94); box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .55);
+  transition: transform .2s, background .2s;
+}
+.ow-btn:not([hidden]) { animation: owIn .5s cubic-bezier(.2, .9, .3, 1.3) both; }
+.ow-btn:hover { background: #fff; transform: translateY(-2px); }
+.ow-btn:focus-visible { outline: 3px solid var(--sol); outline-offset: 3px; }
+.ow-btn svg { color: var(--crust); }
+@keyframes owIn { from { opacity: 0; transform: translateY(10px) scale(.92); } }
+
+.ow-panel { display: flex; align-items: center; gap: 16px; padding: 11px 8px 2px; color: #F6E7CF; }
+.ow-stat { display: flex; flex-direction: column; gap: 3px; flex: none; }
+.ow-stat-time { align-items: flex-end; min-width: 70px; }
+.ow-label { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(246, 231, 207, .62); }
+.ow-led { width: 7px; height: 7px; border-radius: 50%; background: #FF7A22; box-shadow: 0 0 8px #FF7A22; }
+.ow-value { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1; font-variant-numeric: tabular-nums; color: #FFC46B; text-shadow: 0 0 14px rgba(255, 150, 50, .4); }
+.ow-value small { font-family: var(--sans); font-size: 12px; font-weight: 600; margin-left: 3px; color: rgba(246, 231, 207, .7); text-shadow: none; }
+.ow-bar { flex: 1; height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.ow-bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #F2C66B, var(--crust), #E2561B); }
 
 /* ============ Marquee ============ */
 .marquee { overflow: hidden; color: #fff; padding: 20px 0; background: linear-gradient(#fff 0 5px, var(--celeste-d) 5px calc(100% - 5px), #fff calc(100% - 5px)); }
@@ -563,14 +594,23 @@ html.has-aviso { --aviso-h: 40px; }
   :root { --nav-h: 60px; }
   .nav-links { display: none; }
   .brand-name { font-size: 18px; }
-  .oven-scroll { height: 360vh; }
-  .oven-sticky {
-    grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; gap: 0;
-    padding: calc(var(--nav-h) + var(--aviso-h, 0px) + 10px) 16px 18px;
+  /* hero en una columna: título, horno, pasos y botones (hero-copy se "abre" para intercalar el video) */
+  .hero-inner {
+    grid-template-columns: 1fr; align-items: start; gap: 0; min-height: 0;
+    padding: calc(var(--nav-h) + var(--aviso-h, 0px) + 14px) 16px 26px;
   }
-  .oven-copy { order: 2; max-width: none; }
-  .oven-visual { order: 1; width: min(100%, 50svh); margin: 0 auto 10px; }
-  .hero-title { font-size: clamp(34px, 9.5vw, 52px); margin-bottom: 12px; }
+  .hero-copy { display: contents; }
+  .hero-copy .eyebrow { order: 1; }
+  .hero-title { order: 2; font-size: clamp(34px, 9.5vw, 52px); margin-bottom: 14px; }
+  .oven-window { order: 3; margin: 0 0 14px; padding: 8px 8px 7px; border-radius: 22px; }
+  .steps { order: 4; }
+  .hero-cta { order: 5; }
+  .ow-glass { border-radius: 15px; }
+  .ow-panel { gap: 12px; padding: 8px 6px 1px; }
+  .ow-value { font-size: 22px; }
+  .ow-label { font-size: 9px; }
+  .ow-stat-time { min-width: 58px; }
+  .ow-btn { min-height: 40px; font-size: 13px; padding: 0 14px; }
   .hero-title .line { display: inline; }
   .hero-title .line-em { display: block; }
   .hero-sub { display: none; }
@@ -584,15 +624,9 @@ html.has-aviso { --aviso-h: 40px; }
     padding: 8px 14px; border-radius: 14px; background: var(--paper); box-shadow: var(--shadow-sm);
   }
   .step-t small { font-size: 12px; }
-  .oven-copy .hero-cta .btn { min-height: 44px; font-size: 14px; }
-  .hud { padding: 7px 10px 9px; min-width: 92px; border-radius: 14px; }
-  .hud-value { font-size: 24px; }
-  .hud-label { font-size: 9px; }
-  .hud-temp { left: -2%; top: 4%; }
-  .hud-time { right: -2%; bottom: 4%; padding-right: 48px; }
-  .ring { width: 34px; height: 34px; right: 8px; }
-  .scroll-hint { bottom: 10px; }
-  .scroll-hint i { display: none; }
+  .hero-copy .hero-cta { flex-direction: column; align-items: stretch; gap: 10px; }
+  .hero-copy .hero-cta .btn { flex: none; min-height: 46px; font-size: 15px; }
+  .hero-copy .hero-cta .btn-order { width: 100%; }
   .story-grid, .delivery-grid, .faq-wrap { grid-template-columns: 1fr; gap: 36px; }
   .story, .menu, .anatomy, .delivery, .how { padding: 76px 0; }
   .reels-sec { padding: 76px 0 60px; }
@@ -611,17 +645,32 @@ html.has-aviso { --aviso-h: 40px; }
   .btn { min-height: 46px; }
   .hero-cta .btn { flex: 1; }
   .final-cta .hero-cta { flex-direction: column; width: 100%; }
+  /* filtros en el celular: entran todos a lo ancho, sin deslizar ni cortarse.
+     Sin los numeritos y con texto en dos líneas si hace falta ("Formas especiales"). */
+  .filters { display: flex; width: 100%; gap: 3px; padding: 4px; border-radius: 18px; overflow: visible; }
+  .filters button {
+    flex: 1 1 auto; justify-content: center; min-height: 46px; padding: 6px 7px; border-radius: 14px;
+    font-size: 13.5px; line-height: 1.12; text-align: center; white-space: normal;
+  }
+  .filters button small { display: none; }
 }
-@media (max-height: 700px) and (max-width: 860px) {
-  .oven-visual { width: min(100%, 40svh); }
+@media (max-width: 420px) {
+  /* el nombre de la marca en una sola línea en celulares angostos */
+  .nav { gap: 10px; }
+  .brand { gap: 8px; }
+  .brand img { width: 40px; height: 40px; }
+  .brand-name { font-size: 17px; white-space: nowrap; }
+  .brand-sub { font-size: 9px; letter-spacing: .28em; }
+  .nav-cta { padding: 0 12px; gap: 6px; }
 }
-
-/* Movimiento reducido: sin scroll-scrub, se muestra el chipá horneado */
+@media (max-width: 350px) {
+  .filters button { font-size: 12px; padding: 6px 4px; }
+  .brand img { display: none; }   /* en pantallas muy chicas no entra el logo al lado del nombre */
+}
+/* Movimiento reducido: el video no arranca solo, se ve la foto del chipá horneado */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .oven-scroll { height: auto; }
-  .oven-sticky { position: relative; height: auto; min-height: 100svh; }
-  .scroll-hint, .oven-progress { display: none; }
+  .ow-btn:not([hidden]) { animation: none; }
   .step { opacity: 1; display: flex !important; }
   .js .reveal { opacity: 1; }
 }
