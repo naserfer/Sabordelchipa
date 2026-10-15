@@ -282,7 +282,7 @@
   // inclinada en 3D cuando se abre un <select>, Chrome dibuja la lista desplegable corrida.
   if (!reduce && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const level = (c, ms) => { c._flat = true; animate(c, { rotateX: 0, rotateY: 0, duration: ms, ease: 'outQuad' }); };
-    const picking = c => { const a = document.activeElement; return !!a && a.tagName === 'SELECT' && c.contains(a); };
+    const picking = c => { const a = document.activeElement; return !!a && (a.tagName === 'SELECT' || a.tagName === 'INPUT') && c.contains(a); };
     document.addEventListener('pointerdown', e => {
       const c = e.target.closest?.('.card');
       if (c && e.target.closest('select')) { level(c, 0); c.style.transform = 'none'; }

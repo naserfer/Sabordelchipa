@@ -108,7 +108,7 @@
           <p class="card-desc">${esc(p.descripcion)}</p>
           ${p.unidades ? `<p class="card-units">${esc(p.unidades)}</p>` : ''}
           <div class="card-foot">
-            ${(p.opciones || []).length ? `<select class="select" aria-label="Variedad de ${esc(p.nombre)}">${p.opciones.map(o => `<option>${esc(o)}</option>`).join('')}</select>` : ''}
+            ${flavorHtml(p)}
             <div class="seg" role="group" aria-label="Presentación">
               ${priceBtn('medio', '½ kg', p.precio_medio, firstOn)}${priceBtn('kilo', '1 kg', p.precio_kilo, !firstOn)}
             </div>
@@ -116,6 +116,27 @@
           </div>
         </div>
       </article>`;
+  }
+  function flavorHtml(p) {
+    const ops = p.opciones || [];
+    if (ops.length) {
+      return `<div class="flavor" role="group" aria-label="Gustos de ${esc(p.nombre)}">
+        <p class="flavor-label">Podés elegir más de un gusto en la misma bolsa</p>
+        ${ops.map(o => `<label><input type="checkbox" data-opt value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}
+        <input class="flavor-otro" type="text" maxlength="80" placeholder="Otro (ej.: champis)" aria-label="Otro gusto">
+      </div>`;
+    }
+    if (/mix|sabor|gusto/i.test(p.nombre || '')) {
+      return `<label class="flavor-solo">Sabores (si es más de uno, anotalos)
+        <input class="flavor-otro" type="text" maxlength="80" placeholder="Ej.: champis y jamón y queso">
+      </label>`;
+    }
+    return '';
+  }
+  function saboresDe(root) {
+    const picked = $$('[data-opt]:checked', root).map(i => i.value.trim()).filter(Boolean);
+    const extra = ($('.flavor-otro', root)?.value || '').trim();
+    return [...picked, extra].filter(Boolean).join(' + ');
   }
   function renderGrid() {
     const groups = groupsNow();
@@ -193,19 +214,23 @@
     const card = add.closest('.card');
     const p = byId(card.dataset.id); if (!p) return;
     const size = $('.seg [aria-pressed="true"]', card).dataset.size;
-    const opt = $('select', card)?.value || '';
+    const opt = saboresDe(card);
     addItem({ id: p.id, size, opt });
     window.SaborFX?.fly(add);
-    toast(`Sumaste ${p.nombre} ${size === 'medio' ? '½ kg' : '1 kg'} 🙌`);
+    toast(`Sumaste ${p.nombre} ${size === 'medio' ? '½ kg' : '1 kg'}${opt ? ' · ' + opt : ''} 🙌`);
+    $$('[data-opt]', card).forEach(i => { i.checked = false; });
+    const otro = $('.flavor-otro', card); if (otro) otro.value = '';
   });
 
   $('#addMix').addEventListener('click', e => {
     const chosen = $$('#mixOptions input:checked').map(i => i.value);
     if (chosen.length < 2) { toast('Elegí al menos 2 variedades para tu mix'); return; }
-    addItem({ id: 'mix', size: 'medio', opt: chosen.join(' + ') });
+    const extra = ($('#mixSabores')?.value || '').trim();
+    addItem({ id: 'mix', size: 'medio', opt: extra ? `${chosen.join(' + ')} · ${extra}` : chosen.join(' + ') });
     window.SaborFX?.fly(e.currentTarget);
     toast('Sumaste un mix de ½ kg 🙌');
     $$('#mixOptions input').forEach(i => i.checked = false);
+    if ($('#mixSabores')) $('#mixSabores').value = '';
   });
 
   // ---------- videos: botón con el precio actual y reproducción automática ----------
@@ -381,6 +406,11 @@
     ].join('\n');
     window.open(waBase() + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
     guardarPedido({ codigo: pedidoN, nombre, direccion: dir, telefono: String(f.get('telefono') || ''), entrega: f.get('entrega'), pago: f.get('pago'), notas });
+    cart = [];
+    save();
+    renderCart();
+    closeCart();
+    toast('Pedido enviado. Si no se abrió WhatsApp, escribinos de nuevo.');
   });
 
   // El pedido también queda guardado en el panel (/admin → Pedidos) con su cliente.
@@ -389,9 +419,11 @@
     window.SaborTrack?.evento('pedido');
     if (!window.SB || !SB.configured) return;
     const idDe = nombre => (P.find(p => p.nombre === nombre) || {}).id;
-    const items = cart.map(c => c.id === 'mix'
-      ? { product_id: 'mix', size: 'medio', qty: c.qty, opt: c.opt, mix: c.opt.split(' + ').map(idDe).filter(Boolean) }
-      : { product_id: c.id, size: c.size, qty: c.qty, opt: c.opt });
+    const items = cart.map(c => {
+      if (c.id !== 'mix') return { product_id: c.id, size: c.size, qty: c.qty, opt: c.opt };
+      const nombres = String(c.opt || '').split(' · ')[0].split(' + ');
+      return { product_id: 'mix', size: 'medio', qty: c.qty, opt: c.opt, mix: nombres.map(idDe).filter(Boolean) };
+    });
     const p = { ...datos, items, visitante: window.SaborTrack ? SaborTrack.visitante() : '' };
     SB.rpc('crear_pedido_web', { p }, { keepalive: true }).catch(err => console.warn('No se pudo guardar el pedido en el panel:', err.message));
   }
