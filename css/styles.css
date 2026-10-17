@@ -282,6 +282,10 @@ button { font: inherit; color: inherit; }
 }
 .flavor input:checked + span { background: var(--ink); color: #FFF8EA; border-color: var(--ink); }
 .flavor input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
+.flavor-nota { width: 100%; margin: -2px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.flavor-nota b, .flavor .hecho { color: var(--wa-dark); font-weight: 700; }
+.flavor .hecho { font-size: 11px; white-space: nowrap; }
+.flavor input:checked + span .hecho { color: #BFEBCD; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--cream-2); border-radius: 14px; padding: 4px; gap: 4px; }
 .seg button { border: 0; border-radius: 10px; background: transparent; padding: 8px 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
 .seg button small { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }

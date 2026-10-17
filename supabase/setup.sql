@@ -46,6 +46,7 @@ create table if not exists public.products (
   categoria text not null default 'especiales',    -- 'clasicos' | 'formas' | 'especiales'
   tags text[] not null default '{}',
   opciones text[] not null default '{}',
+  opciones_listas text[] not null default '{}',     -- gustos que ya están hechos (la web los marca «Hay hecho»)
   a_pedido boolean not null default false,
   disponible boolean not null default true,
   en_mix boolean not null default false,
@@ -56,6 +57,7 @@ create table if not exists public.products (
 -- columnas agregadas después (por si la tabla ya existía)
 alter table public.products add column if not exists fotos text[] not null default '{}';
 alter table public.products add column if not exists categoria text not null default 'especiales';
+alter table public.products add column if not exists opciones_listas text[] not null default '{}';
 
 -- fecha de modificación automática
 create or replace function public.touch_updated_at()
@@ -124,7 +126,7 @@ on conflict (id) do nothing;
 
 insert into public.products (id, categoria, nombre, descripcion, precio_medio, precio_kilo, unidades, img, fotos, tags, opciones, a_pedido, disponible, en_mix, orden) values
   ('clasico', 'clasicos', 'Chipá clásico', 'Tres quesos (600 g por kilo de masa), fécula de mandioca Femag, leche deslactosada y manteca La Serenísima, huevos de granja, sal y un toque de pimienta. La base de todas nuestras variedades.', 12000, 22000, '≈ 15 unidades por ½ kg', 'img/clasicos.webp', array['img/textura-chipa.webp']::text[], array['Siempre disponible']::text[], array['Con sal', 'Sin sal agregada']::text[], false, true, true, 1),
-  ('galletitas', 'formas', 'Galletitas de chipá', 'Finas galletas, crocantes por fuera y esponjosas por dentro. Para el mate, la picada o una birra bien fría.', 15000, 25000, '≈ 24 unidades por ½ kg', 'img/galletitas-tapeo.webp', array['img/galletitas-plato.webp']::text[], array['Para picar']::text[], '{}'::text[], true, true, true, 2),
+  ('galletitas', 'formas', 'Galletitas de chipá', 'Finas galletas, crocantes por fuera y esponjosas por dentro. Para el mate, la picada o una birra bien fría.', 15000, 25000, '≈ 24 unidades por ½ kg', 'img/galletitas-tapeo.webp', array['img/galletitas-plato.webp']::text[], array['Para picar']::text[], '{}'::text[], false, true, true, 2),
   ('bolitas', 'formas', 'Chipá bolita', 'Pequeñas bolitas de 6 g, puro queso. El bocadito para mirar el partido o sumar a la picada.', 15000, 25000, '≈ 80 unidades por ½ kg', 'img/bolitas-mano.webp', array['img/picada-grisines-bolitas.webp']::text[], array['Bocaditos']::text[], '{}'::text[], true, true, true, 3),
   ('grisines', 'formas', 'Grisines de chipá', 'Palitos de 20 cm de largo, crocantes y con mucho queso. Ideales para la picada y las salsitas.', 15000, 25000, '≈ 16 unidades por ½ kg', 'img/grisines-plato.webp', array['img/grisines-bowl.webp', 'img/picada-grisines-bolitas.webp']::text[], array['Para picar']::text[], '{}'::text[], true, true, true, 4),
   ('relleno', 'especiales', 'Chipá relleno', 'Corazón de jamón Paladini y queso parmesano, siempre en stock. A pedido: roquefort, caprese, salame y queso, panceta, cebolla caramelizada con queso y más.', 15000, 25000, '≈ 10 unidades por ½ kg', 'img/rellenos.webp', '{}'::text[], array['Relleno']::text[], array['Jamón y queso', 'Roquefort', 'Caprese', 'Salame y queso', 'Panceta', 'Cebolla caramelizada y queso']::text[], false, true, true, 5),
@@ -346,7 +348,9 @@ drop trigger if exists movimientos_aplicar on public.movimientos_stock;
 create trigger movimientos_aplicar after insert on public.movimientos_stock
   for each row execute function public.movimientos_aplicar();
 
--- stock en 0 (o menos) → «Sin stock» en la web; con stock → «Hay stock»
+-- El stock es solo para el panel: ya no prende ni apaga productos en la web
+-- (2026-10-17, ver migrations/20261017_stock_informativo.sql). «disponible»
+-- es un interruptor manual («Se puede pedir»). La función queda sin efecto.
 create or replace function public.inventario_sync()
 returns trigger
 language plpgsql
@@ -354,8 +358,6 @@ security invoker
 set search_path = ''
 as $$
 begin
-  update public.products p set disponible = (new.stock_kg > 0)
-  where p.id = new.product_id and p.disponible is distinct from (new.stock_kg > 0);
   return null;
 end;
 $$;

@@ -19,7 +19,8 @@
 --   - Triggers: al pasar un pedido a «entregado» se descuenta el stock;
 --     si vuelve atrás, se cancela o se borra, el stock se devuelve.
 --     Con stock en 0 el producto pasa a «Sin stock» en la web, y vuelve
---     a «Hay stock» cuando se carga más.
+--     a «Hay stock» cuando se carga más. (Ya no: desde 20261017 el stock
+--     no toca la web; ver 20261017_stock_informativo.sql.)
 --
 --  Seguridad:
 --   - RLS activo en todas las tablas nuevas. Leer, crear, editar y borrar

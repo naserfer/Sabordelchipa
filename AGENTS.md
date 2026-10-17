@@ -52,7 +52,8 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
   - `fotos text[]`: fotos extra (mismo formato que `img`).
   - `categoria text`: `clasicos` | `formas` | `especiales` (si viene otra cosa, se muestra en Especiales).
   - `tags text[]`, `opciones text[]`.
-  - `a_pedido`, `disponible`, `en_mix` (bool), `orden int`.
+  - `opciones_listas text[]`: gustos de `opciones` que ya están hechos. La web los marca «✓ Hay hecho»; se tildan en la hoja de «Stock» del panel.
+  - `a_pedido`, `disponible`, `en_mix` (bool), `orden int`. `disponible` es el interruptor manual «Se puede pedir» (el stock no lo toca).
 - `admins(user_id → auth.users)` y función `is_admin()` (SECURITY INVOKER).
 - Seguridad (RLS):
   - Lectura pública de settings y products.
@@ -67,7 +68,7 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
 - Archivos:
   - `admin/admin.js`: núcleo (login, pestañas, productos, negocio, cuenta). Expone `window.Panel` (helpers, eventos `ready` / `tab` / `products` / `refresh` / `logout`, hojas).
   - `admin/crm.js`: Inicio, Pedidos y Clientes (estados, cobro, unir duplicados, CSV para Excel con `;` y BOM, aviso de pedidos nuevos cada 60 s).
-  - `admin/stock.js`: stock en kg por producto (entradas, mermas, correcciones, aviso de mínimo).
+  - `admin/stock.js`: stock en kg por producto (entradas, mermas, correcciones, aviso de mínimo) y gustos hechos. Es solo para el panel. Los productos «a pedido» no avisan en 0.
   - `admin/visitas.js`: estadísticas de visitas. `admin/charts.js`: gráficos SVG propios (sin librerías).
   - `js/track.js` (solo en la web pública): contador anónimo. `SaborTrack.evento('carrito' | 'pedido' | 'whatsapp')`.
 - La web guarda cada pedido al tocar «Enviar pedido por WhatsApp» (`crear_pedido_web`, con `keepalive`, sin frenar el envío). Campo opcional «Tu WhatsApp» en el formulario.
@@ -76,7 +77,7 @@ Web de un emprendimiento de chipá artesanal congelado en CABA, Argentina. Leé 
   - `pedidos` (codigo = el N.º del mensaje de WhatsApp, cliente_id, items jsonb `[{product_id, nombre, size, opt, qty, unit, mix?}]`, kg, envio, total, estado `nuevo|confirmado|entregado|cancelado`, pagado, origen `web|manual`).
   - `inventario` (stock_kg, minimo_kg) y `movimientos_stock` (delta, motivo `produccion|venta|devolucion|ajuste|merma`).
   - `eventos`: visitas anónimas (id al azar del navegador, sin IP). Se borran solas a los ~13 meses.
-  - Triggers: al pasar un pedido a «entregado» se descuenta el stock (el mix se reparte entre sus variedades); si vuelve atrás, se cancela o se borra, se devuelve. Stock ≤ 0 → `products.disponible = false`; con stock → `true`.
+  - Triggers: al pasar un pedido a «entregado» se descuenta el stock (el mix se reparte entre sus variedades); si vuelve atrás, se cancela o se borra, se devuelve. El stock NO toca la web: desde `20261017_stock_informativo.sql`, `inventario_sync` no hace nada (casi todo se hace a pedido y con stock en 0 la gente no podía pedir). No vuelvas a atar `disponible` al stock.
   - Seguridad: RLS en todo; solo `is_admin()` lee o escribe. anon solo puede llamar a `crear_pedido_web` y `registrar_evento` (SECURITY DEFINER, validan y recortan todo, con freno anti-spam).
 - Ventas = pedidos confirmados + entregados. Los «nuevo» de la web pueden no concretarse.
 - El MCP de Supabase no puede aplicar sentencias `drop` / `delete` / `revoke` (piden una aprobación que no llega y se vencen): esas partes las corre el dueño en el SQL Editor.

@@ -112,7 +112,7 @@
             <div class="seg" role="group" aria-label="Presentación">
               ${priceBtn('medio', '½ kg', p.precio_medio, firstOn)}${priceBtn('kilo', '1 kg', p.precio_kilo, !firstOn)}
             </div>
-            <button class="btn btn-primary add-btn" type="button" data-add ${off ? 'disabled' : ''}>${off ? 'Sin stock por ahora' : 'Sumar al pedido'}</button>
+            <button class="btn btn-primary add-btn" type="button" data-add ${off ? 'disabled' : ''}>${off ? 'No disponible por ahora' : 'Sumar al pedido'}</button>
           </div>
         </div>
       </article>`;
@@ -120,9 +120,11 @@
   function flavorHtml(p) {
     const ops = p.opciones || [];
     if (ops.length) {
+      const hechos = new Set((p.opciones_listas || []).filter(o => ops.includes(o)));   // gustos que ya están hechos
       return `<div class="flavor" role="group" aria-label="Gustos de ${esc(p.nombre)}">
         <p class="flavor-label">Podés elegir más de un gusto en la misma bolsa</p>
-        ${ops.map(o => `<label><input type="checkbox" data-opt value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}
+        ${hechos.size ? '<p class="flavor-nota"><b>✓ Hay hecho</b>: ya está en el freezer. Los demás gustos los hacemos a pedido.</p>' : ''}
+        ${ops.map(o => `<label><input type="checkbox" data-opt value="${esc(o)}"><span>${esc(o)}${hechos.has(o) ? ' <small class="hecho">✓ Hay hecho</small>' : ''}</span></label>`).join('')}
         <input class="flavor-otro" type="text" maxlength="80" placeholder="Otro (ej.: champis)" aria-label="Otro gusto">
       </div>`;
     }

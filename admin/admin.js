@@ -165,11 +165,11 @@
         <div class="pmain" data-edit role="button" tabindex="0" aria-label="Editar ${esc(p.nombre)}">
           <b>${esc(p.nombre)}</b>
           <span><span class="nw">½ kg ${money(p.precio_medio)}</span> · <span class="nw">1 kg ${money(p.precio_kilo)}</span></span>
-          <div class="chips">${p.a_pedido ? '<span class="chip">A pedido</span>' : ''}${p.en_mix ? '<span class="chip">Mix</span>' : ''}${(p.fotos || []).length ? `<span class="chip">${(p.fotos || []).length + (p.img ? 1 : 0)} fotos</span>` : ''}${p.disponible ? '' : '<span class="chip">Sin stock</span>'}</div>
+          <div class="chips">${p.a_pedido ? '<span class="chip">A pedido</span>' : ''}${p.en_mix ? '<span class="chip">Mix</span>' : ''}${(p.fotos || []).length ? `<span class="chip">${(p.fotos || []).length + (p.img ? 1 : 0)} fotos</span>` : ''}${p.disponible ? '' : '<span class="chip">Pausado</span>'}</div>
           ${Panel.productExtra(p)}
         </div>
         <div class="pside">
-          <label class="switch" title="Hay stock"><input type="checkbox" data-stock ${p.disponible ? 'checked' : ''} aria-label="Hay stock de ${esc(p.nombre)}"><span></span></label>
+          <label class="switch" title="Se puede pedir"><input type="checkbox" data-stock ${p.disponible ? 'checked' : ''} aria-label="Se puede pedir ${esc(p.nombre)}"><span></span></label>
           <button type="button" class="btn btn-ghost btn-xs" data-stock-open aria-label="Stock de ${esc(p.nombre)}">Stock</button>
           <div class="order">
             <button type="button" data-move="-1" ${i === 0 || catIdx(products[i - 1]) !== catIdx(p) ? 'disabled' : ''} aria-label="Subir">▲</button>
@@ -200,7 +200,7 @@
     const id = e.target.closest('.pitem').dataset.id, p = products.find(x => x.id === id);
     const val = e.target.checked;
     try {
-      await guard(() => SB.update('products', 'id=eq.' + encodeURIComponent(id), { disponible: val }), val ? 'Marcado con stock ✓' : 'Marcado sin stock');
+      await guard(() => SB.update('products', 'id=eq.' + encodeURIComponent(id), { disponible: val }), val ? 'Se puede pedir ✓' : 'Pausado: en la web no se puede pedir');
       p.disponible = val; renderList();
     } catch (_) { e.target.checked = !val; }
   });
@@ -309,6 +309,8 @@
       a_pedido: form.a_pedido.checked,
       en_mix: form.en_mix.checked
     };
+    // gustos hechos: se tildan en la hoja de «Stock»; acá solo se sacan los que ya no están
+    row.opciones_listas = ((editing && editing.opciones_listas) || []).filter(o => row.opciones.includes(o));
     let id = editing && editing.id;
     if (!id) {
       id = slug(nombre); let n = 2; const base = id;

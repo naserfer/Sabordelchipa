@@ -128,7 +128,7 @@
     <!-- Productos -->
     <section class="panel" id="tab-productos" hidden>
       <div class="panel-head">
-        <div><h2>Productos</h2><p class="muted small">Tocá un producto para editarlo. El interruptor marca si hay stock; «Stock» carga los kilos.</p></div>
+        <div><h2>Productos</h2><p class="muted small">Tocá un producto para editarlo. El interruptor marca si se puede pedir en la web; «Stock» carga los kilos y los gustos que tenés hechos.</p></div>
         <button class="btn btn-primary" type="button" id="newProduct">＋ Nuevo</button>
       </div>
       <div id="stockResumen"></div>
@@ -247,7 +247,7 @@
       <label>Etiquetas (separadas por coma)<input name="tags" placeholder="Tres quesos, Vegano"></label>
       <label>Variedades / sabores para elegir (una por línea, opcional)<textarea name="opciones" rows="3"></textarea></label>
       <div class="checks">
-        <label class="check"><input type="checkbox" name="disponible"> Hay stock</label>
+        <label class="check"><input type="checkbox" name="disponible"> Se puede pedir en la web</label>
         <label class="check"><input type="checkbox" name="a_pedido"> Se hace a pedido</label>
         <label class="check"><input type="checkbox" name="en_mix"> Puede ir en el mix</label>
       </div>
@@ -379,6 +379,11 @@
         <div><h2 id="sTitle">Stock</h2><p class="muted small" id="sSub"></p></div>
         <button class="icon-btn" type="button" data-close aria-label="Cerrar">✕</button>
       </div>
+      <fieldset id="sListasBox" hidden>
+        <legend>¿Qué gustos tenés hechos?</legend>
+        <p class="muted small">Tildá los que ya están en el freezer. En la web salen con «Hay hecho»; los demás se pueden pedir igual (se hacen a pedido).</p>
+        <div class="checks" id="sListas"></div>
+      </fieldset>
       <div class="stock-now" id="sNow"></div>
       <fieldset id="sMoveBox">
         <legend id="sMoveLegend">Cargar movimiento</legend>

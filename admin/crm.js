@@ -117,11 +117,10 @@
     if (i >= 0) pedidos[i] = o; else pedidos.unshift(o);
     pedidos.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   }
-  // si un pedido entra o sale de «Entregado», la base mueve el stock y puede cambiar «Hay stock»
+  // si un pedido entra o sale de «Entregado», la base mueve el stock (solo panel: no toca la web)
   async function afterStockChange(before, after) {
     if ((before && before.estado === 'entregado') || (after && after.estado === 'entregado')) {
       if (window.Stock) await Stock.load();
-      await P.reloadProducts().catch(() => {});
     }
   }
 
@@ -332,7 +331,7 @@
   function prodOptions(sel) {
     const ps = P.products;
     const has = sel === 'mix' || ps.some(p => p.id === sel);
-    return ps.map(p => `<option value="${esc(p.id)}"${p.id === sel ? ' selected' : ''}>${esc(p.nombre)}${p.disponible ? '' : ' (sin stock)'}</option>`).join('')
+    return ps.map(p => `<option value="${esc(p.id)}"${p.id === sel ? ' selected' : ''}>${esc(p.nombre)}${p.disponible ? '' : ' (pausado)'}</option>`).join('')
       + `<option value="mix"${sel === 'mix' ? ' selected' : ''}>Mix ½ kg (varias variedades)</option>`
       + (!has && sel ? `<option value="${esc(sel)}" selected>${esc(sel)} (ya no existe)</option>` : '');
   }
